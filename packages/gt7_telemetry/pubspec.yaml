@@ -1,0 +1,14 @@
+name: gt7_telemetry
+description: GT7 telemetry transport, decoding, and session stream package.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  pointycastle: ^4.0.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

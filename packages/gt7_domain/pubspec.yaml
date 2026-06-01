@@ -1,0 +1,13 @@
+name: gt7_domain
+description: Shared GT7 race-domain models and prediction contracts.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
