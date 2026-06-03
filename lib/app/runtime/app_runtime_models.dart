@@ -133,6 +133,7 @@ class RaceViewState {
     required this.estimatedFuelToEnd,
     required this.estimatedTotalTimeMs,
     required this.distanceFromTargetMs,
+    required this.targetAvgLapTimeMs,
     required this.lastUpdatedAt,
     this.currentLap,
     this.lastCompletedLap,
@@ -151,6 +152,7 @@ class RaceViewState {
       estimatedFuelToEnd: 0,
       estimatedTotalTimeMs: 0,
       distanceFromTargetMs: 0,
+      targetAvgLapTimeMs: 0,
       lastUpdatedAt: DateTime.now(),
     );
   }
@@ -190,10 +192,17 @@ class RaceViewState {
         ? 0.0
         : estimatedTotalTimeMs - config.targetRaceTime.inMilliseconds;
 
+    final predictedStints = List<RaceStint>.unmodifiable(race.predictedStints);
+    final pitStopAdjustmentMs =
+        race.pitLaneTimeMs * (predictedStints.length - 1).clamp(0, 999);
+    final targetAvgLapTimeMs = race.raceLaps <= 0
+        ? 0.0
+        : (race.raceTimeMs - pitStopAdjustmentMs) / race.raceLaps;
+
     return RaceViewState(
       config: config,
       laps: laps,
-      predictedStints: List<RaceStint>.unmodifiable(race.predictedStints),
+      predictedStints: predictedStints,
       currentLap: currentLap,
       lastCompletedLap: lastCompletedLap,
       currentLapNumber: race.currentLapNumber < 0 ? 0 : race.currentLapNumber,
@@ -206,6 +215,7 @@ class RaceViewState {
           : race.estimatedTotalFuelToEnd(lapNumberForEstimates),
       estimatedTotalTimeMs: estimatedTotalTimeMs,
       distanceFromTargetMs: distanceFromTargetMs,
+      targetAvgLapTimeMs: targetAvgLapTimeMs,
       lastUpdatedAt: DateTime.now(),
     );
   }
@@ -219,6 +229,8 @@ class RaceViewState {
   final int completedLapCount;
   final double averageLapTimeMs;
   final double averageConsumptionPerLap;
+  /// Target average lap time adjusted for predicted pit stops (ms).
+  final double targetAvgLapTimeMs;
   final int predictedStopLap;
   final double estimatedFuelToEnd;
   final double estimatedTotalTimeMs;

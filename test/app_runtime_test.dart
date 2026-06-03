@@ -26,7 +26,7 @@ void main() {
               targetLaps: 18,
               targetRaceTime: Duration(minutes: 30),
               pitLaneTime: Duration(seconds: 42),
-              shiftRpm: 7650,
+              shiftPercentage: 85,
               manualPlaystationIp: ' 192.168.0.12 ',
             )
             .toJson(),
@@ -40,7 +40,7 @@ void main() {
       expect(service.config.targetLaps, 18);
       expect(service.config.targetRaceTime, const Duration(minutes: 30));
       expect(service.config.pitLaneTime, const Duration(seconds: 42));
-      expect(service.config.shiftRpm, 7650);
+      expect(service.config.shiftPercentage, 85);
       expect(service.config.normalizedManualPlaystationIp, '192.168.0.12');
     });
   });

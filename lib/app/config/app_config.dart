@@ -1,5 +1,7 @@
 import 'package:gt7_domain/gt7_domain.dart';
 
+enum DashboardViewMode { tablet, smartphone }
+
 class AppConfig {
   const AppConfig({
     required this.trackName,
@@ -7,9 +9,13 @@ class AppConfig {
     required this.targetLaps,
     required this.targetRaceTime,
     required this.pitLaneTime,
-    required this.shiftRpm,
+    required this.shiftPercentage,
     required this.rawLoggingEnabled,
     required this.replaySpeedMultiplier,
+    required this.tyreColdMax,
+    required this.tyreOptimalMax,
+    required this.tyreHotMax,
+    required this.viewMode,
     this.manualPlaystationIp,
   });
 
@@ -19,9 +25,13 @@ class AppConfig {
       targetLaps = 10,
       targetRaceTime = const Duration(minutes: 15),
       pitLaneTime = const Duration(seconds: 30),
-      shiftRpm = 7800,
+      shiftPercentage = 85,
       rawLoggingEnabled = false,
       replaySpeedMultiplier = 1.0,
+      tyreColdMax = 70,
+      tyreOptimalMax = 90,
+      tyreHotMax = 110,
+      viewMode = DashboardViewMode.tablet,
       manualPlaystationIp = null;
 
   final String trackName;
@@ -29,9 +39,17 @@ class AppConfig {
   final int targetLaps;
   final Duration targetRaceTime;
   final Duration pitLaneTime;
-  final int shiftRpm;
+  /// Short shift warning threshold as a percentage (75-100%) of max alert RPM.
+  final int shiftPercentage;
   final bool rawLoggingEnabled;
   final double replaySpeedMultiplier;
+  /// Tyre temp (°C) below which tyre is considered cold (blue).
+  final int tyreColdMax;
+  /// Tyre temp (°C) below which tyre is considered optimal (green).
+  final int tyreOptimalMax;
+  /// Tyre temp (°C) below which tyre is considered hot (yellow). Above = overheated (red).
+  final int tyreHotMax;
+  final DashboardViewMode viewMode;
   final String? manualPlaystationIp;
 
   String? get normalizedManualPlaystationIp {
@@ -50,9 +68,13 @@ class AppConfig {
     int? targetLaps,
     Duration? targetRaceTime,
     Duration? pitLaneTime,
-    int? shiftRpm,
+    int? shiftPercentage,
     bool? rawLoggingEnabled,
     double? replaySpeedMultiplier,
+    int? tyreColdMax,
+    int? tyreOptimalMax,
+    int? tyreHotMax,
+    DashboardViewMode? viewMode,
     String? manualPlaystationIp,
     bool clearManualPlaystationIp = false,
   }) {
@@ -62,10 +84,14 @@ class AppConfig {
       targetLaps: targetLaps ?? this.targetLaps,
       targetRaceTime: targetRaceTime ?? this.targetRaceTime,
       pitLaneTime: pitLaneTime ?? this.pitLaneTime,
-      shiftRpm: shiftRpm ?? this.shiftRpm,
+      shiftPercentage: shiftPercentage ?? this.shiftPercentage,
       rawLoggingEnabled: rawLoggingEnabled ?? this.rawLoggingEnabled,
       replaySpeedMultiplier:
           replaySpeedMultiplier ?? this.replaySpeedMultiplier,
+      tyreColdMax: tyreColdMax ?? this.tyreColdMax,
+      tyreOptimalMax: tyreOptimalMax ?? this.tyreOptimalMax,
+      tyreHotMax: tyreHotMax ?? this.tyreHotMax,
+      viewMode: viewMode ?? this.viewMode,
       manualPlaystationIp: clearManualPlaystationIp
           ? null
           : manualPlaystationIp ?? this.manualPlaystationIp,
@@ -79,9 +105,13 @@ class AppConfig {
       'targetLaps': targetLaps,
       'targetRaceTimeMs': targetRaceTime.inMilliseconds,
       'pitLaneTimeMs': pitLaneTime.inMilliseconds,
-      'shiftRpm': shiftRpm,
+      'shiftPercentage': shiftPercentage,
       'rawLoggingEnabled': rawLoggingEnabled,
       'replaySpeedMultiplier': replaySpeedMultiplier,
+      'tyreColdMax': tyreColdMax,
+      'tyreOptimalMax': tyreOptimalMax,
+      'tyreHotMax': tyreHotMax,
+      'viewMode': viewMode.name,
       'manualPlaystationIp': normalizedManualPlaystationIp,
     };
   }
@@ -89,6 +119,13 @@ class AppConfig {
   factory AppConfig.fromJson(Map<String, Object?> json) {
     final defaults = const AppConfig.defaults();
     final raceTypeName = json['raceType'] as String?;
+    final rawCold = _readInt(json['tyreColdMax'], defaults.tyreColdMax, minimum: 40);
+    final rawOptimal = _readInt(json['tyreOptimalMax'], defaults.tyreOptimalMax, minimum: 40);
+    final rawHot = _readInt(json['tyreHotMax'], defaults.tyreHotMax, minimum: 40);
+    // Enforce cold < optimal < hot with at least 5°C spacing
+    final cold = rawCold.clamp(40, 145);
+    final optimal = rawOptimal.clamp(cold + 5, 150);
+    final hot = rawHot.clamp(optimal + 5, 155);
     return AppConfig(
       trackName: (json['trackName'] as String?)?.trim().isNotEmpty == true
           ? (json['trackName'] as String).trim()
@@ -112,13 +149,20 @@ class AppConfig {
           minimum: 0,
         ),
       ),
-      shiftRpm: _readInt(json['shiftRpm'], defaults.shiftRpm, minimum: 1000),
+      shiftPercentage: _readInt(json['shiftPercentage'], defaults.shiftPercentage, minimum: 75).clamp(75, 100),
       rawLoggingEnabled:
           (json['rawLoggingEnabled'] as bool?) ?? defaults.rawLoggingEnabled,
       replaySpeedMultiplier: _readDouble(
         json['replaySpeedMultiplier'],
         defaults.replaySpeedMultiplier,
         minimum: 0.1,
+      ),
+      tyreColdMax: cold,
+      tyreOptimalMax: optimal,
+      tyreHotMax: hot,
+      viewMode: DashboardViewMode.values.firstWhere(
+        (v) => v.name == json['viewMode'],
+        orElse: () => defaults.viewMode,
       ),
       manualPlaystationIp: (json['manualPlaystationIp'] as String?)?.trim(),
     );

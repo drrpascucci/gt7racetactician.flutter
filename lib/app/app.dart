@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gt7_design_system/gt7_design_system.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'config/app_config_service.dart';
 import 'config/shared_preferences_app_config_store.dart';
@@ -16,7 +17,8 @@ class Gt7TelemetryApp extends StatefulWidget {
   State<Gt7TelemetryApp> createState() => _Gt7TelemetryAppState();
 }
 
-class _Gt7TelemetryAppState extends State<Gt7TelemetryApp> {
+class _Gt7TelemetryAppState extends State<Gt7TelemetryApp>
+    with WidgetsBindingObserver {
   late final AppConfigService _configService;
   late final AppRuntimeController _runtimeController;
   bool _splashDone = false;
@@ -24,6 +26,7 @@ class _Gt7TelemetryAppState extends State<Gt7TelemetryApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _configService = AppConfigService(store: SharedPreferencesAppConfigStore());
     _runtimeController = AppRuntimeController(configService: _configService);
     unawaited(_runtimeController.initialize());
@@ -31,9 +34,28 @@ class _Gt7TelemetryAppState extends State<Gt7TelemetryApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _runtimeController.dispose();
     _configService.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (_splashDone) {
+          unawaited(WakelockPlus.enable());
+        }
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        unawaited(WakelockPlus.disable());
+        break;
+      case AppLifecycleState.hidden:
+        break;
+    }
   }
 
   void _onSplashReady() {
@@ -41,6 +63,7 @@ class _Gt7TelemetryAppState extends State<Gt7TelemetryApp> {
       return;
     }
     setState(() => _splashDone = true);
+    unawaited(WakelockPlus.enable());
   }
 
   @override

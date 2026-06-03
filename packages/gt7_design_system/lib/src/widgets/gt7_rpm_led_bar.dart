@@ -9,6 +9,7 @@ class Gt7RpmLedBar extends StatelessWidget {
     super.key,
     required this.rpm,
     required this.limit,
+    this.blinkAboveRpm,
     this.label,
     this.totalLeds = 20,
     this.compact = false,
@@ -16,6 +17,9 @@ class Gt7RpmLedBar extends StatelessWidget {
 
   final double rpm;
   final double limit;
+  /// When set, LEDs blink when [rpm] >= [blinkAboveRpm].
+  /// Falls back to 98% of [limit] when null.
+  final double? blinkAboveRpm;
   final String? label;
   final int totalLeds;
   final bool compact;
@@ -23,13 +27,14 @@ class Gt7RpmLedBar extends StatelessWidget {
   static bool shouldBlink({
     required double rpm,
     required double limit,
+    double? blinkAboveRpm,
     double blinkThreshold = 0.98,
   }) {
     if (limit <= 0) {
       return false;
     }
-
-    return rpm >= limit * blinkThreshold;
+    final threshold = blinkAboveRpm ?? (limit * blinkThreshold);
+    return rpm >= threshold;
   }
 
   static int activeLedCountFor({
@@ -53,7 +58,7 @@ class Gt7RpmLedBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final gt7 = context.gt7Theme;
     final ledHeight = compact ? 18.0 : 24.0;
-    final blink = shouldBlink(rpm: rpm, limit: limit);
+    final blink = shouldBlink(rpm: rpm, limit: limit, blinkAboveRpm: blinkAboveRpm);
     final activeLeds = blink
         ? totalLeds
         : activeLedCountFor(rpm: rpm, limit: limit, totalLeds: totalLeds);

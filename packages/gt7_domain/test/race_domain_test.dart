@@ -180,5 +180,42 @@ void main() {
 
       expect(lap.deltaFromTargetMs, 500);
     });
+
+    test('handles zero fuel consumption gracefully', () {
+      final race = Race(RaceType.lapRace, 10, 900000, pitLaneTimeMs: 30000);
+
+      // Add laps with no fuel consumption
+      race.addOrUpdateLap(
+        RaceLap(
+          lapNumber: 0,
+          fuel: 100,
+          lapTimeMs: 0,
+          position: 1,
+          complete: true,
+        ),
+      );
+      race.addOrUpdateLap(
+        RaceLap(
+          lapNumber: 1,
+          fuel: 100,
+          lapTimeMs: 90000,
+          position: 1,
+          complete: true,
+        ),
+      );
+      race.addOrUpdateLap(
+        RaceLap(
+          lapNumber: 2,
+          fuel: 100,
+          lapTimeMs: 92000,
+          position: 1,
+          complete: true,
+        ),
+      );
+
+      expect(race.averageConsumptionPerLap, 0);
+      expect(race.predictedStints, isEmpty);
+      expect(race.estimatedTotalFuelToEnd(2), 0);
+    });
   });
 }

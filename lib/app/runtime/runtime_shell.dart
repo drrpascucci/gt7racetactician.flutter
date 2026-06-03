@@ -14,7 +14,7 @@ Future<void> _openSettingsScreen(
 ) async {
   await Navigator.of(context).push(
     MaterialPageRoute<void>(
-      fullscreenDialog: true,
+      fullscreenDialog: false,
       builder: (context) => _RuntimeSettingsScreen(controller: controller),
     ),
   );
@@ -58,13 +58,23 @@ class RuntimeShell extends StatelessWidget {
                 controller.telemetryState,
                 controller.raceState,
               ]),
-              builder: (context, _) => _DashboardScreen(
+            builder: (context, _) {
+              final config = controller.configService.config;
+              return _DashboardScreen(
                 controller: controller,
-                config: controller.configService.config,
+                config: config,
                 telemetry: controller.telemetryState.value,
                 connection: controller.connectionState,
                 race: controller.raceState.value,
-              ),
+                onToggleViewMode: () {
+                  final current = controller.configService.config;
+                  final next = current.viewMode == DashboardViewMode.tablet
+                      ? DashboardViewMode.smartphone
+                      : DashboardViewMode.tablet;
+                  controller.updateConfig(current.copyWith(viewMode: next));
+                },
+              );
+            },
             ),
           ),
         );
@@ -243,6 +253,7 @@ class _DashboardScreen extends StatelessWidget {
     required this.telemetry,
     required this.connection,
     required this.race,
+    required this.onToggleViewMode,
   });
 
   final AppRuntimeController controller;
@@ -250,6 +261,7 @@ class _DashboardScreen extends StatelessWidget {
   final TelemetryViewState telemetry;
   final RuntimeConnectionState connection;
   final RaceViewState race;
+  final VoidCallback onToggleViewMode;
 
   @override
   Widget build(BuildContext context) {
@@ -267,17 +279,31 @@ class _DashboardScreen extends StatelessWidget {
             // ROW 1b — strategy banner (full width)
             _StrategySection(race: race),
             Container(height: 1, color: const Color(0xFF333333)),
-            // ROW 2 — main content (Expanded)
+            // ROW 2 — main content (Expanded) — double-tap toggles view mode
             Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // LEFT: lap table (~80%)
-                  Expanded(flex: 80, child: _LapSection(race: race)),
-                  Container(width: 1, color: const Color(0xFF333333)),
-                  // RIGHT: tyre temps (~20%)
-                  Expanded(flex: 20, child: _TyreSection(telemetry: telemetry)),
-                ],
+              child: GestureDetector(
+                onDoubleTap: onToggleViewMode,
+                behavior: HitTestBehavior.opaque,
+                child: config.viewMode == DashboardViewMode.smartphone
+                    ? _SmartphoneDashboard(
+                        race: race,
+                        telemetry: telemetry,
+                        config: config,
+                      )
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(flex: 80, child: _LapSection(race: race)),
+                          Container(width: 1, color: const Color(0xFF333333)),
+                          Expanded(
+                            flex: 20,
+                            child: _TyreSection(
+                              telemetry: telemetry,
+                              config: config,
+                            ),
+                          ),
+                        ],
+                      ),
               ),
             ),
             // ROW 3 — button toolbar
@@ -306,9 +332,16 @@ class _DashboardTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rpm = telemetry.engineRpm;
-    final rpmLimit = config.shiftRpm > 0
-        ? config.shiftRpm.toDouble()
-        : (telemetry.packet?.maxAlertRpm.toDouble() ?? 7800);
+    final packet = telemetry.packet;
+    // Use maxAlertRpm from live telemetry when available; fall back to 7800
+    final maxAlertRpm = (packet != null && packet.maxAlertRpm > 0)
+        ? packet.maxAlertRpm.toDouble()
+        : 7800.0;
+    // Apply short shift percentage to get the effective LED max
+    final rpmLimit = maxAlertRpm * (config.shiftPercentage / 100.0);
+    final blinkAboveRpm = (packet != null && packet.minAlertRpm > 0)
+        ? packet.minAlertRpm.toDouble()
+        : null;
     final rpmFraction = rpmLimit > 0 ? (rpm / rpmLimit).clamp(0.0, 1.0) : 0.0;
 
     return Container(
@@ -366,7 +399,12 @@ class _DashboardTopBar extends StatelessWidget {
           const SizedBox(width: 8),
           // Gear LED bar — fills remaining space
           Expanded(
-            child: Gt7RpmLedBar(rpm: rpm, limit: rpmLimit, compact: true),
+            child: Gt7RpmLedBar(
+              rpm: rpm,
+              limit: rpmLimit,
+              blinkAboveRpm: blinkAboveRpm,
+              compact: true,
+            ),
           ),
         ],
       ),
@@ -401,134 +439,151 @@ class _DashboardToolbar extends StatelessWidget {
         ? '⚠ RETRY'
         : '▶ START SIM';
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final compactToolbar = constraints.maxWidth < 320;
-
-        return Container(
-          color: const Color(0xFF1E1E1E),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Row(
-            children: [
-              _ToolbarIconButton(
-                icon: Icons.settings,
-                tooltip: 'Open settings',
-                onPressed: () => _openSettingsScreen(context, controller),
-              ),
-              const SizedBox(width: 4),
-              _ToolbarIconButton(
-                icon: Icons.refresh,
-                tooltip: 'Reconnect',
-                onPressed: isBusy ? null : controller.reconnect,
-              ),
-              SizedBox(width: compactToolbar ? 4 : 6),
-              Flexible(
-                fit: FlexFit.loose,
-                child: Tooltip(
-                  message: _telemetryControlTooltip(phase),
-                  child: ElevatedButton(
-                    onPressed: isBusy ? null : controller.toggleTelemetry,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: simBtnBg,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: compactToolbar ? 8 : 10,
-                      ),
-                      minimumSize: const Size(0, 28),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        side: BorderSide(
-                          color: isLive
-                              ? const Color(0xFFFF4444)
-                              : const Color(0xFF555555),
-                        ),
-                      ),
-                      textStyle: TextStyle(
-                        fontSize: compactToolbar ? 9 : 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    child: Text(simBtnLabel, overflow: TextOverflow.ellipsis),
-                  ),
-                ),
-              ),
-              SizedBox(width: compactToolbar ? 4 : 6),
-              if (compactToolbar)
-                _ToolbarIconButton(
-                  icon: Icons.replay,
-                  tooltip: 'Reset session',
-                  onPressed: controller.resetSession,
-                )
-              else
-                Flexible(
-                  fit: FlexFit.loose,
-                  child: Tooltip(
-                    message: 'Reset session',
-                    child: TextButton(
-                      onPressed: controller.resetSession,
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFAAAAAA),
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        minimumSize: const Size(0, 28),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                          side: const BorderSide(color: Color(0xFF555555)),
-                        ),
-                        textStyle: const TextStyle(fontSize: 10),
-                      ),
-                      child: const Text(
-                        '▶ REPLAY',
-                        overflow: TextOverflow.ellipsis,
-                      ),
+    return Container(
+      color: const Color(0xFF1E1E1E),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // START SIM - main action button
+          Flexible(
+            fit: FlexFit.loose,
+            child: Tooltip(
+              message: _telemetryControlTooltip(phase),
+              child: ElevatedButton(
+                onPressed: isBusy ? null : controller.toggleTelemetry,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: simBtnBg,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  minimumSize: const Size(0, 40),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                    side: BorderSide(
+                      color: isLive
+                          ? const Color(0xFFFF4444)
+                          : const Color(0xFF555555),
                     ),
                   ),
+                  textStyle: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              const SizedBox(width: 4),
-              _ToolbarIconButton(
-                icon: Icons.sports_esports,
-                tooltip: 'Change PlayStation',
+                child: Text(simBtnLabel, overflow: TextOverflow.ellipsis),
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          // REPLAY
+          Flexible(
+            fit: FlexFit.loose,
+            child: Tooltip(
+              message: 'Reset session',
+              child: ElevatedButton(
+                onPressed: controller.resetSession,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF333333),
+                  foregroundColor: const Color(0xFFAAAAAA),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  minimumSize: const Size(0, 40),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                    side: const BorderSide(color: Color(0xFF555555)),
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                child: const Text('▶ REPLAY', overflow: TextOverflow.ellipsis),
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          // FIND PS
+          Flexible(
+            fit: FlexFit.loose,
+            child: Tooltip(
+              message: 'Change PlayStation',
+              child: ElevatedButton(
                 onPressed: controller.changePlaystation,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF333333),
+                  foregroundColor: const Color(0xFFAAAAAA),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  minimumSize: const Size(0, 40),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                    side: const BorderSide(color: Color(0xFF555555)),
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                child: const Text('🎮 FIND PS', overflow: TextOverflow.ellipsis),
               ),
-              if (!compactToolbar) const Spacer(),
-            ],
+            ),
           ),
-        );
-      },
-    );
-  }
-}
-
-class _ToolbarIconButton extends StatelessWidget {
-  const _ToolbarIconButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 28,
-      height: 28,
-      child: Tooltip(
-        message: tooltip,
-        child: IconButton(
-          padding: EdgeInsets.zero,
-          icon: Icon(
-            icon,
-            size: 16,
-            color: onPressed != null
-                ? const Color(0xFFAAAAAA)
-                : const Color(0xFF555555),
+          const SizedBox(width: 4),
+          // RELOAD
+          Flexible(
+            fit: FlexFit.loose,
+            child: Tooltip(
+              message: 'Reconnect',
+              child: ElevatedButton(
+                onPressed: isBusy ? null : controller.reconnect,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF333333),
+                  foregroundColor: const Color(0xFFAAAAAA),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  minimumSize: const Size(0, 40),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                    side: const BorderSide(color: Color(0xFF555555)),
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                child: const Text('🔄 RELOAD', overflow: TextOverflow.ellipsis),
+              ),
+            ),
           ),
-          onPressed: onPressed,
-        ),
+          const SizedBox(width: 4),
+          // SETTINGS
+          Flexible(
+            fit: FlexFit.loose,
+            child: Tooltip(
+              message: 'Open settings',
+              child: ElevatedButton(
+                onPressed: () => _openSettingsScreen(context, controller),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF333333),
+                  foregroundColor: const Color(0xFFAAAAAA),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  minimumSize: const Size(0, 40),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                    side: const BorderSide(color: Color(0xFF555555)),
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                child: const Text('⚙ SETTINGS', overflow: TextOverflow.ellipsis),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -567,7 +622,7 @@ class _StrategySection extends StatelessWidget {
               'DRIVER ASSIST',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 8,
+                fontSize: 10,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -622,7 +677,7 @@ class _StrategySection extends StatelessWidget {
                                 'Length: $raceLength',
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 8,
+                                  fontSize: 10,
                                 ),
                               ),
                             ),
@@ -631,7 +686,7 @@ class _StrategySection extends StatelessWidget {
                                 'Target: $targetLabel',
                                 style: const TextStyle(
                                   color: Color(0xFF64B5F6),
-                                  fontSize: 8,
+                                  fontSize: 10,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -641,7 +696,7 @@ class _StrategySection extends StatelessWidget {
                                 'Avg: $avgLabel',
                                 style: const TextStyle(
                                   color: Color(0xFFFFB300),
-                                  fontSize: 8,
+                                  fontSize: 10,
                                 ),
                                 textAlign: TextAlign.end,
                               ),
@@ -760,9 +815,10 @@ class _LapSection extends StatelessWidget {
 }
 
 class _TyreSection extends StatelessWidget {
-  const _TyreSection({required this.telemetry});
+  const _TyreSection({required this.telemetry, required this.config});
 
   final TelemetryViewState telemetry;
+  final AppConfig config;
 
   @override
   Widget build(BuildContext context) {
@@ -775,11 +831,23 @@ class _TyreSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: _TyreTile(label: 'FL', temp: temps.frontLeft),
+                child: _TyreTile(
+                  label: 'FL',
+                  temp: temps.frontLeft,
+                  coldMax: config.tyreColdMax,
+                  optimalMax: config.tyreOptimalMax,
+                  hotMax: config.tyreHotMax,
+                ),
               ),
               Container(width: 1, color: const Color(0xFF333333)),
               Expanded(
-                child: _TyreTile(label: 'FR', temp: temps.frontRight),
+                child: _TyreTile(
+                  label: 'FR',
+                  temp: temps.frontRight,
+                  coldMax: config.tyreColdMax,
+                  optimalMax: config.tyreOptimalMax,
+                  hotMax: config.tyreHotMax,
+                ),
               ),
             ],
           ),
@@ -790,11 +858,23 @@ class _TyreSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: _TyreTile(label: 'RL', temp: temps.rearLeft),
+                child: _TyreTile(
+                  label: 'RL',
+                  temp: temps.rearLeft,
+                  coldMax: config.tyreColdMax,
+                  optimalMax: config.tyreOptimalMax,
+                  hotMax: config.tyreHotMax,
+                ),
               ),
               Container(width: 1, color: const Color(0xFF333333)),
               Expanded(
-                child: _TyreTile(label: 'RR', temp: temps.rearRight),
+                child: _TyreTile(
+                  label: 'RR',
+                  temp: temps.rearRight,
+                  coldMax: config.tyreColdMax,
+                  optimalMax: config.tyreOptimalMax,
+                  hotMax: config.tyreHotMax,
+                ),
               ),
             ],
           ),
@@ -805,21 +885,42 @@ class _TyreSection extends StatelessWidget {
 }
 
 class _TyreTile extends StatelessWidget {
-  const _TyreTile({required this.label, required this.temp});
+  const _TyreTile({
+    required this.label,
+    required this.temp,
+    required this.coldMax,
+    required this.optimalMax,
+    required this.hotMax,
+  });
 
   final String label;
   final double temp;
+  final int coldMax;
+  final int optimalMax;
+  final int hotMax;
 
   @override
   Widget build(BuildContext context) {
-    final tone = _tyreTone(context, temp);
+    final tone = _tyreTone(
+      temp,
+      coldMax: coldMax,
+      optimalMax: optimalMax,
+      hotMax: hotMax,
+    );
+    
+    // Determine corner position: FL=top-left, FR=top-right, RL=bottom-left, RR=bottom-right
+    final bool isTopCorner = label == 'FL' || label == 'FR';
+    final bool isLeftCorner = label == 'FL' || label == 'RL';
+    
     return Container(
       color: const Color(0xFF222222),
       child: Stack(
         children: [
           Positioned(
-            top: 4,
-            left: 6,
+            top: isTopCorner ? 4 : null,
+            bottom: isTopCorner ? null : 4,
+            left: isLeftCorner ? 6 : null,
+            right: isLeftCorner ? null : 6,
             child: Text(
               label,
               style: const TextStyle(
@@ -837,6 +938,309 @@ class _TyreTile extends StatelessWidget {
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SmartphoneDashboard extends StatelessWidget {
+  const _SmartphoneDashboard({
+    required this.race,
+    required this.telemetry,
+    required this.config,
+  });
+
+  final RaceViewState race;
+  final TelemetryViewState telemetry;
+  final AppConfig config;
+
+  @override
+  Widget build(BuildContext context) {
+    final temps = telemetry.tireTemperatures;
+    final targetLapMs = race.targetAvgLapTimeMs;
+    final lastLapDelta = race.lastCompletedLap?.deltaFromTargetMs ?? 0.0;
+    final hasLastLap = race.lastCompletedLap != null;
+    final avgDelta = (race.averageLapTimeMs > 0 && targetLapMs > 0)
+        ? race.averageLapTimeMs - targetLapMs
+        : 0.0;
+    final hasAvgData = race.averageLapTimeMs > 0 && targetLapMs > 0;
+
+    final predictedStints = race.predictedStints;
+    final stopLap = race.predictedStopLap;
+    final remainingStops = (predictedStints.length - 1).clamp(0, 999);
+    final hasData = predictedStints.isNotEmpty;
+
+    const sep = Color(0xFF333333);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Row 1: LAST | AVG | FL | FR
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _DeltaBox(
+                  label: 'LAST',
+                  deltaMs: lastLapDelta,
+                  hasData: hasLastLap,
+                ),
+              ),
+              Container(width: 1, color: sep),
+              Expanded(
+                child: _DeltaBox(
+                  label: 'AVG',
+                  deltaMs: avgDelta,
+                  hasData: hasAvgData,
+                ),
+              ),
+              Container(width: 1, color: sep),
+              Expanded(
+                child: _TyreTile(
+                  label: 'FL',
+                  temp: temps.frontLeft,
+                  coldMax: config.tyreColdMax,
+                  optimalMax: config.tyreOptimalMax,
+                  hotMax: config.tyreHotMax,
+                ),
+              ),
+              Container(width: 1, color: sep),
+              Expanded(
+                child: _TyreTile(
+                  label: 'FR',
+                  temp: temps.frontRight,
+                  coldMax: config.tyreColdMax,
+                  optimalMax: config.tyreOptimalMax,
+                  hotMax: config.tyreHotMax,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(height: 1, color: sep),
+        // Row 2: NEXT STOP | TOT STOPS | RL | RR
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _FuelStopBox(
+                  stopLap: stopLap,
+                  hasData: hasData,
+                  raceType: config.raceType,
+                  targetLaps: config.targetLaps,
+                  predictedStints: predictedStints,
+                  targetRaceTimeMs: config.targetRaceTime.inMilliseconds.toDouble(),
+                ),
+              ),
+              Container(width: 1, color: sep),
+              Expanded(
+                child: _RemainingStopsBox(
+                  stops: remainingStops,
+                  hasData: hasData,
+                ),
+              ),
+              Container(width: 1, color: sep),
+              Expanded(
+                child: _TyreTile(
+                  label: 'RL',
+                  temp: temps.rearLeft,
+                  coldMax: config.tyreColdMax,
+                  optimalMax: config.tyreOptimalMax,
+                  hotMax: config.tyreHotMax,
+                ),
+              ),
+              Container(width: 1, color: sep),
+              Expanded(
+                child: _TyreTile(
+                  label: 'RR',
+                  temp: temps.rearRight,
+                  coldMax: config.tyreColdMax,
+                  optimalMax: config.tyreOptimalMax,
+                  hotMax: config.tyreHotMax,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DeltaBox extends StatelessWidget {
+  const _DeltaBox({
+    required this.label,
+    required this.deltaMs,
+    required this.hasData,
+  });
+
+  final String label;
+  final double deltaMs;
+  final bool hasData;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color bg;
+    final Color fg;
+    final IconData icon;
+
+    if (!hasData) {
+      bg = const Color(0xFF1A1A1A);
+      fg = const Color(0xFF666666);
+      icon = Icons.remove;
+    } else if (deltaMs < -1000) {
+      bg = const Color(0xFF0A2540); // blue — faster
+      fg = const Color(0xFF42A5F5);
+      icon = Icons.arrow_upward;
+    } else if (deltaMs > 1000) {
+      bg = const Color(0xFF3B0000); // red — slower
+      fg = const Color(0xFFEF5350);
+      icon = Icons.arrow_downward;
+    } else {
+      bg = const Color(0xFF0D2010); // green — on target
+      fg = const Color(0xFF66BB6A);
+      icon = Icons.remove;
+    }
+
+    return Container(
+      color: bg,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: fg.withValues(alpha: 0.7),
+              fontSize: 27, // 9 * 3
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Icon(icon, color: fg, size: 22),
+          const SizedBox(height: 2),
+          Text(
+            hasData
+                ? _formatAdaptiveSignedDurationMs(deltaMs, compact: true)
+                : '—',
+            style: TextStyle(
+              color: fg,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'RobotoMono',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FuelStopBox extends StatelessWidget {
+  const _FuelStopBox({
+    required this.stopLap,
+    required this.hasData,
+    required this.raceType,
+    required this.targetLaps,
+    required this.predictedStints,
+    required this.targetRaceTimeMs,
+  });
+
+  final int stopLap;
+  final bool hasData;
+  final RaceType raceType;
+  final int targetLaps;
+  final List<RaceStint> predictedStints;
+  final double targetRaceTimeMs;
+
+  bool _isStopBeyondRaceEnd() {
+    if (!hasData || stopLap <= 0) {
+      return false;
+    }
+
+    if (raceType == RaceType.lapRace) {
+      // For lap races: show * if stop lap >= total laps
+      return stopLap >= targetLaps;
+    } else {
+      // For time races: check if first stint ends after race duration
+      if (predictedStints.isEmpty) {
+        return false;
+      }
+      return predictedStints.first.endTimeMs >= targetRaceTimeMs;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isBeyondEnd = _isStopBeyondRaceEnd();
+    final lapText = !hasData
+        ? '—'
+        : stopLap <= 0
+        ? 'END'
+        : isBeyondEnd
+        ? '*'
+        : 'L$stopLap';
+    return Container(
+      color: const Color(0xFF1A1A1A),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            lapText,
+            style: const TextStyle(
+              color: Color(0xFFFF6F00),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'RobotoMono',
+            ),
+          ),
+          const Text(
+            'NEXT STOP',
+            style: TextStyle(
+              color: Color(0xFFFF6F00),
+              fontSize: 27, // 9 * 3
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RemainingStopsBox extends StatelessWidget {
+  const _RemainingStopsBox({required this.stops, required this.hasData});
+
+  final int stops;
+  final bool hasData;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFF1A1A1A),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            hasData ? '$stops' : '—',
+            style: const TextStyle(
+              color: Color(0xFFFF6F00),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'RobotoMono',
+            ),
+          ),
+          const Text(
+            'TOT STOPS',
+            style: TextStyle(
+              color: Color(0xFFFF6F00),
+              fontSize: 27, // 9 * 3
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
@@ -1191,7 +1595,7 @@ class _LapTableHeaderCell extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: Gt7Typography.tableHeader(
             color ?? gt7.description,
-          ).copyWith(fontSize: 11),
+          ).copyWith(fontSize: 12),
         ),
       ),
     );
@@ -1458,7 +1862,7 @@ class _SettingsOverviewPanel extends StatelessWidget {
                 ? '${config.targetRaceTime.inMinutes} min'
                 : '${config.targetLaps} laps',
           ),
-          _MetricTile(label: 'Shift RPM', value: '${config.shiftRpm}'),
+          _MetricTile(label: 'Shift %', value: '${config.shiftPercentage}%'),
           _MetricTile(
             label: 'Manual IP',
             value: config.normalizedManualPlaystationIp ?? 'Auto discovery',
@@ -1565,8 +1969,11 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
   late final TextEditingController _lapsController;
   late final TextEditingController _minutesController;
   late final TextEditingController _pitLaneController;
-  late final TextEditingController _shiftRpmController;
+  late double _shiftPercentage;
   late RaceType _raceType;
+  late double _tyreColdMax;
+  late double _tyreOptimalMax;
+  late double _tyreHotMax;
 
   @override
   void initState() {
@@ -1580,8 +1987,11 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
     _pitLaneController = TextEditingController(
       text: '${config.pitLaneTime.inSeconds}',
     );
-    _shiftRpmController = TextEditingController(text: '${config.shiftRpm}');
+    _shiftPercentage = config.shiftPercentage.toDouble();
     _raceType = config.raceType;
+    _tyreColdMax = config.tyreColdMax.toDouble();
+    _tyreOptimalMax = config.tyreOptimalMax.toDouble();
+    _tyreHotMax = config.tyreHotMax.toDouble();
   }
 
   @override
@@ -1600,11 +2010,28 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
     if (_pitLaneController.text != '${config.pitLaneTime.inSeconds}') {
       _pitLaneController.text = '${config.pitLaneTime.inSeconds}';
     }
-    if (_shiftRpmController.text != '${config.shiftRpm}') {
-      _shiftRpmController.text = '${config.shiftRpm}';
+    // Only resync slider when persisted value actually changed (not during drag)
+    if (config.shiftPercentage.toDouble() != _shiftPercentage &&
+        config.shiftPercentage.toDouble() !=
+            oldWidget.initialConfig.shiftPercentage) {
+      _shiftPercentage = config.shiftPercentage.toDouble();
     }
     if (_raceType != config.raceType) {
       _raceType = config.raceType;
+    }
+    // Only resync sliders when persisted value actually changed (not during drag)
+    if (config.tyreColdMax.toDouble() != _tyreColdMax &&
+        config.tyreColdMax.toDouble() != oldWidget.initialConfig.tyreColdMax) {
+      _tyreColdMax = config.tyreColdMax.toDouble();
+    }
+    if (config.tyreOptimalMax.toDouble() != _tyreOptimalMax &&
+        config.tyreOptimalMax.toDouble() !=
+            oldWidget.initialConfig.tyreOptimalMax) {
+      _tyreOptimalMax = config.tyreOptimalMax.toDouble();
+    }
+    if (config.tyreHotMax.toDouble() != _tyreHotMax &&
+        config.tyreHotMax.toDouble() != oldWidget.initialConfig.tyreHotMax) {
+      _tyreHotMax = config.tyreHotMax.toDouble();
     }
   }
 
@@ -1614,7 +2041,6 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
     _lapsController.dispose();
     _minutesController.dispose();
     _pitLaneController.dispose();
-    _shiftRpmController.dispose();
     super.dispose();
   }
 
@@ -1691,10 +2117,123 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
               ),
               const SizedBox(width: Gt7Spacing.md),
               Expanded(
-                child: TextField(
-                  controller: _shiftRpmController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Shift RPM'),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 56,
+                      child: Text(
+                        'Shift\n${_shiftPercentage.round()}%',
+                        style: const TextStyle(fontSize: 11),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Expanded(
+                      child: Slider(
+                        value: _shiftPercentage,
+                        min: 75,
+                        max: 100,
+                        divisions: 25,
+                        onChanged: (v) => setState(() => _shiftPercentage = v),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: Gt7Spacing.lg),
+          Text('Tyre temperature thresholds', style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: Gt7Spacing.xs),
+          Text(
+            'Cold < ${_tyreColdMax.round()}° ≤ Optimal < ${_tyreOptimalMax.round()}° ≤ Hot < ${_tyreHotMax.round()}° ≤ Overheated',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: context.gt7Theme.description,
+            ),
+          ),
+          const SizedBox(height: Gt7Spacing.sm),
+          Row(
+            children: [
+              SizedBox(
+                width: 56,
+                child: Text(
+                  'Cold\n${_tyreColdMax.round()}°',
+                  style: const TextStyle(color: Color(0xFF1E88E5), fontSize: 11),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Expanded(
+                child: Slider(
+                  value: _tyreColdMax,
+                  min: 40,
+                  max: 150,
+                  divisions: 110,
+                  onChanged: (v) => setState(() {
+                    _tyreColdMax = v;
+                    if (_tyreOptimalMax < _tyreColdMax + 5) {
+                      _tyreOptimalMax = _tyreColdMax + 5;
+                    }
+                    if (_tyreHotMax < _tyreOptimalMax + 5) {
+                      _tyreHotMax = _tyreOptimalMax + 5;
+                    }
+                  }),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: 56,
+                child: Text(
+                  'Optimal\n${_tyreOptimalMax.round()}°',
+                  style: const TextStyle(color: Color(0xFF43A047), fontSize: 11),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Expanded(
+                child: Slider(
+                  value: _tyreOptimalMax,
+                  min: 40,
+                  max: 150,
+                  divisions: 110,
+                  onChanged: (v) => setState(() {
+                    _tyreOptimalMax = v;
+                    if (_tyreColdMax > _tyreOptimalMax - 5) {
+                      _tyreColdMax = _tyreOptimalMax - 5;
+                    }
+                    if (_tyreHotMax < _tyreOptimalMax + 5) {
+                      _tyreHotMax = _tyreOptimalMax + 5;
+                    }
+                  }),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: 56,
+                child: Text(
+                  'Hot\n${_tyreHotMax.round()}°',
+                  style: const TextStyle(color: Color(0xFFFDD835), fontSize: 11),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Expanded(
+                child: Slider(
+                  value: _tyreHotMax,
+                  min: 40,
+                  max: 150,
+                  divisions: 110,
+                  onChanged: (v) => setState(() {
+                    _tyreHotMax = v;
+                    if (_tyreOptimalMax > _tyreHotMax - 5) {
+                      _tyreOptimalMax = _tyreHotMax - 5;
+                    }
+                    if (_tyreColdMax > _tyreOptimalMax - 5) {
+                      _tyreColdMax = _tyreOptimalMax - 5;
+                    }
+                  }),
                 ),
               ),
             ],
@@ -1736,11 +2275,10 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
             minimum: 0,
           ),
         ),
-        shiftRpm: _readInt(
-          _shiftRpmController.text,
-          original.shiftRpm,
-          minimum: 1000,
-        ),
+        shiftPercentage: _shiftPercentage.round(),
+        tyreColdMax: _tyreColdMax.round(),
+        tyreOptimalMax: _tyreOptimalMax.round(),
+        tyreHotMax: _tyreHotMax.round(),
       ),
     );
     if (!mounted) {
@@ -1779,21 +2317,25 @@ Color _connectionColor(BuildContext context, RuntimeConnectionPhase phase) {
   };
 }
 
-Color _tyreTone(BuildContext context, double temperature) {
-  final gt7 = context.gt7Theme;
+Color _tyreTone(
+  double temperature, {
+  required int coldMax,
+  required int optimalMax,
+  required int hotMax,
+}) {
   if (temperature <= 0) {
-    return gt7.textMuted;
+    return const Color(0xFF888888);
   }
-  if (temperature < 70) {
-    return gt7.computed;
+  if (temperature < coldMax) {
+    return const Color(0xFF1E88E5); // blue — cold
   }
-  if (temperature < 95) {
-    return gt7.positive;
+  if (temperature < optimalMax) {
+    return const Color(0xFF43A047); // green — optimal
   }
-  if (temperature < 105) {
-    return gt7.warning;
+  if (temperature < hotMax) {
+    return const Color(0xFFFDD835); // yellow — hot
   }
-  return gt7.danger;
+  return const Color(0xFFE53935); // red — overheated
 }
 
 Color _deltaTone(BuildContext context, double milliseconds) {

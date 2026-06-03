@@ -76,6 +76,9 @@ class Race {
       return stints;
     }
 
+    // Defensive check: ensure avgConsumptionPerLap is positive before division
+    assert(avgConsumptionPerLap > 0, 'avgConsumptionPerLap must be > 0');
+    
     final lapsWithFullTank = (tankCapacity / avgConsumptionPerLap).floor();
     final lapsWithCurrentFuel = (laps.last.fuel / avgConsumptionPerLap).floor();
 

@@ -25,7 +25,22 @@ void main() {
   test('computes rpm thresholds from legacy logic', () {
     expect(Gt7RpmLedBar.activeLedCountFor(rpm: 5400, limit: 7000), 0);
     expect(Gt7RpmLedBar.activeLedCountFor(rpm: 6400, limit: 7000), 6);
+    // Null blinkAboveRpm falls back to 0.98 * limit (6860) → 6900 blinks
     expect(Gt7RpmLedBar.shouldBlink(rpm: 6900, limit: 7000), isTrue);
+    // blinkAboveRpm override: exact minAlertRpm-style threshold
+    expect(
+      Gt7RpmLedBar.shouldBlink(rpm: 6800, limit: 7000, blinkAboveRpm: 6800),
+      isTrue,
+    );
+    expect(
+      Gt7RpmLedBar.shouldBlink(rpm: 6799, limit: 7000, blinkAboveRpm: 6800),
+      isFalse,
+    );
+    // blinkAboveRpm does NOT fire below threshold even if near limit
+    expect(
+      Gt7RpmLedBar.shouldBlink(rpm: 6860, limit: 7000, blinkAboveRpm: 7000),
+      isFalse,
+    );
   });
 
   testWidgets('renders pill buttons and dialog surfaces', (tester) async {

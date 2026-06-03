@@ -61,10 +61,10 @@ void main() {
         tester.getRect(find.text('FL')).bottom,
         lessThanOrEqualTo(viewportHeight),
       );
-      final openSettingsButton = tester.widget<IconButton>(
+      final openSettingsButton = tester.widget<ElevatedButton>(
         find.descendant(
           of: find.byTooltip('Open settings'),
-          matching: find.byType(IconButton),
+          matching: find.byType(ElevatedButton),
         ),
       );
       openSettingsButton.onPressed!.call();
@@ -324,6 +324,75 @@ void main() {
     controller.dispose();
     await tester.pump();
   });
+
+  testWidgets('double-tap on main area toggles to smartphone mode', (
+    tester,
+  ) async {
+    final controller = await _pumpDashboardShell(
+      tester,
+      physicalSize: const Size(1440, 1800),
+    );
+
+    // Tablet mode default: lap table visible
+    expect(find.text('Last laps'), findsOneWidget);
+    expect(find.text('LAST'), findsNothing);
+
+    // Switch to smartphone mode via config (same effect as double-tap)
+    await controller.updateConfig(
+      controller.configService.config.copyWith(
+        viewMode: DashboardViewMode.smartphone,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Last laps'), findsNothing);
+    expect(find.text('LAST'), findsOneWidget);
+    expect(find.text('AVG'), findsOneWidget);
+
+    // Switch back to tablet mode
+    await controller.updateConfig(
+      controller.configService.config.copyWith(
+        viewMode: DashboardViewMode.tablet,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Last laps'), findsOneWidget);
+    expect(find.text('LAST'), findsNothing);
+
+    controller.dispose();
+    await tester.pump();
+  });
+
+  testWidgets('smartphone mode shows pace indicator and fuel boxes', (
+    tester,
+  ) async {
+    final controller = await _pumpRuntimeShell(
+      tester,
+      physicalSize: const Size(1440, 1800),
+    );
+    await _seedDashboardState(tester, controller);
+
+    await controller.updateConfig(
+      controller.configService.config.copyWith(
+        viewMode: DashboardViewMode.smartphone,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Lap table hidden, smartphone grid visible
+    expect(find.text('Last laps'), findsNothing);
+    expect(find.text('LAST'), findsOneWidget);
+    expect(find.text('AVG'), findsOneWidget);
+    // Tyre section integrated in grid
+    expect(find.text('FL'), findsOneWidget);
+    // Fuel/stop boxes present
+    expect(find.text('NEXT STOP'), findsOneWidget);
+    expect(find.text('TOT STOPS'), findsOneWidget);
+
+    controller.dispose();
+    await tester.pump();
+  });
 }
 
 Future<AppRuntimeController> _pumpRuntimeShell(
@@ -341,7 +410,7 @@ Future<AppRuntimeController> _pumpRuntimeShell(
     trackName: 'Tokyo Expressway',
     targetLaps: 12,
     targetRaceTime: const Duration(minutes: 18),
-    shiftRpm: 7600,
+    shiftPercentage: 85,
   );
   final controller = AppRuntimeController(
     configService: AppConfigService(initialConfig: config),

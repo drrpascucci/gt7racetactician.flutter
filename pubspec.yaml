@@ -19,6 +19,7 @@ dependencies:
     path: packages/ps_discovery
   path_provider: ^2.1.4
   shared_preferences: ^2.3.3
+  wakelock_plus: ^1.2.4
 
 dev_dependencies:
   flutter_test:
