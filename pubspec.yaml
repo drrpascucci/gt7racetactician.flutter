@@ -1,4 +1,4 @@
-name: gt7_telemetry_app
+name: gt7_race_tactitian
 description: Android-first Flutter shell for the GT7 telemetry port.
 publish_to: 'none'
 version: 0.1.0+1

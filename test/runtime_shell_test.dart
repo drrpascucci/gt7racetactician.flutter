@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gt7_design_system/gt7_design_system.dart';
 import 'package:gt7_domain/gt7_domain.dart';
 import 'package:gt7_telemetry/gt7_telemetry.dart';
-import 'package:gt7_telemetry_app/app/config/app_config.dart';
-import 'package:gt7_telemetry_app/app/config/app_config_service.dart';
-import 'package:gt7_telemetry_app/app/runtime/app_runtime_controller.dart';
-import 'package:gt7_telemetry_app/app/runtime/app_runtime_models.dart';
-import 'package:gt7_telemetry_app/app/runtime/runtime_shell.dart';
+import 'package:gt7_race_tactitian/app/config/app_config.dart';
+import 'package:gt7_race_tactitian/app/config/app_config_service.dart';
+import 'package:gt7_race_tactitian/app/runtime/app_runtime_controller.dart';
+import 'package:gt7_race_tactitian/app/runtime/app_runtime_models.dart';
+import 'package:gt7_race_tactitian/app/runtime/runtime_shell.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -336,6 +336,7 @@ void main() {
     // Tablet mode default: lap table visible
     expect(find.text('Last laps'), findsOneWidget);
     expect(find.text('LAST'), findsNothing);
+    expect(find.text('DRIVER ASSIST'), findsOneWidget);
 
     // Switch to smartphone mode via config (same effect as double-tap)
     await controller.updateConfig(
@@ -348,6 +349,7 @@ void main() {
     expect(find.text('Last laps'), findsNothing);
     expect(find.text('LAST'), findsOneWidget);
     expect(find.text('AVG'), findsOneWidget);
+    expect(find.text('DRIVER ASSIST'), findsNothing);
 
     // Switch back to tablet mode
     await controller.updateConfig(
@@ -359,6 +361,7 @@ void main() {
 
     expect(find.text('Last laps'), findsOneWidget);
     expect(find.text('LAST'), findsNothing);
+    expect(find.text('DRIVER ASSIST'), findsOneWidget);
 
     controller.dispose();
     await tester.pump();
@@ -384,6 +387,7 @@ void main() {
     expect(find.text('Last laps'), findsNothing);
     expect(find.text('LAST'), findsOneWidget);
     expect(find.text('AVG'), findsOneWidget);
+    expect(find.text('DRIVER ASSIST'), findsNothing);
     // Tyre section integrated in grid
     expect(find.text('FL'), findsOneWidget);
     // Fuel/stop boxes present

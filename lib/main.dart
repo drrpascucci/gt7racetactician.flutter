@@ -10,5 +10,5 @@ void main() async {
     DeviceOrientation.landscapeRight,
   ]);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  runApp(const Gt7TelemetryApp());
+  runApp(const GT7RaceTactician());
 }

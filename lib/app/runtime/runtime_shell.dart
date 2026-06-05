@@ -268,6 +268,7 @@ class _DashboardScreen extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final showStatusBar = constraints.maxWidth >= 500;
+        final isSmartphone = config.viewMode == DashboardViewMode.smartphone;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -276,9 +277,11 @@ class _DashboardScreen extends StatelessWidget {
               height: 44,
               child: _DashboardTopBar(config: config, telemetry: telemetry),
             ),
-            // ROW 1b — strategy banner (full width)
-            _StrategySection(race: race),
-            Container(height: 1, color: const Color(0xFF333333)),
+            if (!isSmartphone) ...[
+              // ROW 1b — strategy banner (full width)
+              _StrategySection(race: race),
+              Container(height: 1, color: const Color(0xFF333333)),
+            ],
             // ROW 2 — main content (Expanded) — double-tap toggles view mode
             Expanded(
               child: GestureDetector(
@@ -1092,19 +1095,25 @@ class _DeltaBox extends StatelessWidget {
     if (!hasData) {
       bg = const Color(0xFF1A1A1A);
       fg = const Color(0xFF666666);
-      icon = Icons.remove;
+      icon = Icons.pending;
     } else if (deltaMs < -1000) {
       bg = const Color(0xFF0A2540); // blue — faster
       fg = const Color(0xFF42A5F5);
-      icon = Icons.arrow_upward;
+      icon = Icons.arrow_downward;
     } else if (deltaMs > 1000) {
       bg = const Color(0xFF3B0000); // red — slower
       fg = const Color(0xFFEF5350);
-      icon = Icons.arrow_downward;
+      icon = Icons.arrow_upward;
     } else {
       bg = const Color(0xFF0D2010); // green — on target
       fg = const Color(0xFF66BB6A);
-      icon = Icons.remove;
+      if (deltaMs > 0) {
+        icon = Icons.arrow_downward;
+      } else if (deltaMs < 0) {
+        icon = Icons.arrow_upward;
+      } else {
+        icon = Icons.check;
+      }
     }
 
     return Container(
@@ -1179,12 +1188,12 @@ class _FuelStopBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final isBeyondEnd = _isStopBeyondRaceEnd();
     final lapText = !hasData
-        ? '—'
+        ? '---'
         : stopLap <= 0
-        ? 'END'
+        ? '___'
         : isBeyondEnd
-        ? '*'
-        : 'L$stopLap';
+        ? 'NO STOP'
+        : 'L $stopLap';
     return Container(
       color: const Color(0xFF1A1A1A),
       child: Column(
@@ -1227,7 +1236,7 @@ class _RemainingStopsBox extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            hasData ? '$stops' : '—',
+            hasData ? '$stops' : '00',
             style: const TextStyle(
               color: Color(0xFFFF6F00),
               fontSize: 16,

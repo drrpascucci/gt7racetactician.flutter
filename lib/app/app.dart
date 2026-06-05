@@ -10,14 +10,14 @@ import 'runtime/app_runtime_controller.dart';
 import 'runtime/runtime_shell.dart';
 import 'splash/splash_screen.dart';
 
-class Gt7TelemetryApp extends StatefulWidget {
-  const Gt7TelemetryApp({super.key});
+class GT7RaceTactician extends StatefulWidget {
+  const GT7RaceTactician({super.key});
 
   @override
-  State<Gt7TelemetryApp> createState() => _Gt7TelemetryAppState();
+  State<GT7RaceTactician> createState() => _GT7RaceTacticianState();
 }
 
-class _Gt7TelemetryAppState extends State<Gt7TelemetryApp>
+class _GT7RaceTacticianState extends State<GT7RaceTactician>
     with WidgetsBindingObserver {
   late final AppConfigService _configService;
   late final AppRuntimeController _runtimeController;

@@ -6,10 +6,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gt7_domain/gt7_domain.dart';
 import 'package:gt7_telemetry/gt7_telemetry.dart';
-import 'package:gt7_telemetry_app/app/config/app_config.dart';
-import 'package:gt7_telemetry_app/app/config/app_config_service.dart';
-import 'package:gt7_telemetry_app/app/runtime/app_runtime_controller.dart';
-import 'package:gt7_telemetry_app/app/runtime/app_runtime_models.dart';
+import 'package:gt7_race_tactitian/app/config/app_config.dart';
+import 'package:gt7_race_tactitian/app/config/app_config_service.dart';
+import 'package:gt7_race_tactitian/app/runtime/app_runtime_controller.dart';
+import 'package:gt7_race_tactitian/app/runtime/app_runtime_models.dart';
 import 'package:ps_discovery/ps_discovery.dart';
 
 void main() {

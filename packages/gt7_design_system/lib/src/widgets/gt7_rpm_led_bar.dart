@@ -40,18 +40,19 @@ class Gt7RpmLedBar extends StatelessWidget {
   static int activeLedCountFor({
     required double rpm,
     required double limit,
-    int totalLeds = 10,
+    int pTotalLeds = 20,
     double startThreshold = 0.80,
     double stepPercent = 0.02,
   }) {
     if (limit <= 0 || rpm < limit * startThreshold) {
       return 0;
     }
+    stepPercent = (1-startThreshold) / pTotalLeds;
 
     final step = limit * stepPercent;
     final rpmAboveThreshold = rpm - (limit * startThreshold);
 
-    return (rpmAboveThreshold / step).floor().clamp(0, totalLeds - 1) + 1;
+    return (rpmAboveThreshold / step).floor().clamp(0, pTotalLeds - 1) + 1;
   }
 
   @override
@@ -61,7 +62,7 @@ class Gt7RpmLedBar extends StatelessWidget {
     final blink = shouldBlink(rpm: rpm, limit: limit, blinkAboveRpm: blinkAboveRpm);
     final activeLeds = blink
         ? totalLeds
-        : activeLedCountFor(rpm: rpm, limit: limit, totalLeds: totalLeds);
+        : activeLedCountFor(rpm: rpm, limit: limit, pTotalLeds: totalLeds);
 
     return Column(
       mainAxisSize: MainAxisSize.min,

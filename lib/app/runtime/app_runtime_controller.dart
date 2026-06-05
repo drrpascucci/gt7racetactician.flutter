@@ -920,6 +920,8 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       config.targetRaceTime.inMilliseconds.toDouble(),
       pitLaneTimeMs: config.pitLaneTime.inMilliseconds.toDouble(),
     );
+
+    race.targetLaps = _latestPacket?.totalLaps?? config.targetLaps;
     race.trackName = config.trackName;
     race.tankCapacity = _latestPacket?.fuelCapacity ?? 100;
     race.currentFuelLevel = _latestPacket?.fuelLevel ?? 0;
