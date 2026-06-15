@@ -10,6 +10,7 @@ const _emptyWheelValues = Gt7WheelValues(
   frontRight: 0,
   rearLeft: 0,
   rearRight: 0,
+  isEmpty: true
 );
 
 enum RuntimeConnectionPhase {

@@ -1,4 +1,5 @@
 import java.io.File
+import com.android.build.gradle.BaseExtension
 
 allprojects {
     repositories {
@@ -17,9 +18,18 @@ rootProject.layout.buildDirectory.value(newBuildDir)
 subprojects {
     val newSubprojectBuildDir = newBuildDir.map { it.dir(project.name) }
     project.layout.buildDirectory.value(newSubprojectBuildDir)
-}
-subprojects {
-    project.evaluationDependsOn(":app")
+
+    if (project.name != "app") {
+        project.evaluationDependsOn(":app")
+    }
+
+    afterEvaluate {
+        if (project.hasProperty("android")) {
+            project.extensions.configure<com.android.build.gradle.BaseExtension>("android") {
+                ndkVersion = "25.2.9519653"
+            }
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {

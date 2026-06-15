@@ -7,6 +7,7 @@ import 'package:gt7_domain/gt7_domain.dart';
 import '../config/app_config.dart';
 import 'app_runtime_controller.dart';
 import 'app_runtime_models.dart';
+import 'ui_constants.dart';
 
 Future<void> _openSettingsScreen(
   BuildContext context,
@@ -825,7 +826,7 @@ class _TyreSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final temps = telemetry.tireTemperatures;
+    final tyreTemps = telemetry.tireTemperatures;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -836,7 +837,7 @@ class _TyreSection extends StatelessWidget {
               Expanded(
                 child: _TyreTile(
                   label: 'FL',
-                  temp: temps.frontLeft,
+                  temp: tyreTemps.isEmpty  ? 80 : tyreTemps.frontLeft,
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
@@ -846,7 +847,7 @@ class _TyreSection extends StatelessWidget {
               Expanded(
                 child: _TyreTile(
                   label: 'FR',
-                  temp: temps.frontRight,
+                  temp:  tyreTemps.isEmpty  ? 80 : tyreTemps.frontRight,
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
@@ -863,7 +864,7 @@ class _TyreSection extends StatelessWidget {
               Expanded(
                 child: _TyreTile(
                   label: 'RL',
-                  temp: temps.rearLeft,
+                  temp:  tyreTemps.isEmpty  ? 80 : tyreTemps.rearLeft,
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
@@ -873,7 +874,7 @@ class _TyreSection extends StatelessWidget {
               Expanded(
                 child: _TyreTile(
                   label: 'RR',
-                  temp: temps.rearRight,
+                  temp:  tyreTemps.isEmpty  ? 80 : tyreTemps.rearRight,
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
@@ -915,8 +916,12 @@ class _TyreTile extends StatelessWidget {
     final bool isTopCorner = label == 'FL' || label == 'FR';
     final bool isLeftCorner = label == 'FL' || label == 'RL';
     
+    final isBright = tone.computeLuminance() > 0.5;
+    final contentColor = isBright ? Colors.black : Colors.white;
+    final labelColor = isBright ? Colors.black54 : Colors.white70;
+
     return Container(
-      color: const Color(0xFF222222),
+      color: tone,
       child: Stack(
         children: [
           Positioned(
@@ -926,9 +931,9 @@ class _TyreTile extends StatelessWidget {
             right: isLeftCorner ? null : 6,
             child: Text(
               label,
-              style: const TextStyle(
-                color: Color(0xFFCCCCCC),
-                fontSize: 9,
+              style: TextStyle(
+                color: labelColor,
+                fontSize: UiConstants.smallFontSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -937,8 +942,8 @@ class _TyreTile extends StatelessWidget {
             child: Text(
               _temperatureLabel(temp),
               style: TextStyle(
-                color: tone,
-                fontSize: 24,
+                color: contentColor,
+                fontSize: UiConstants.bigFontSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -1125,25 +1130,25 @@ class _DeltaBox extends StatelessWidget {
             label,
             style: TextStyle(
               color: fg.withValues(alpha: 0.7),
-              fontSize: 27, // 9 * 3
+              fontSize: UiConstants.smallFontSize, // 9 * 3
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
             ),
           ),
           const SizedBox(height: 2),
-          Icon(icon, color: fg, size: 22),
-          const SizedBox(height: 2),
           Text(
             hasData
                 ? _formatAdaptiveSignedDurationMs(deltaMs, compact: true)
-                : '—',
+                : '0.000',
             style: TextStyle(
               color: fg,
-              fontSize: 11,
+              fontSize: UiConstants.bigFontSize,
               fontWeight: FontWeight.bold,
               fontFamily: 'RobotoMono',
             ),
           ),
+          const SizedBox(height: 2),
+          Icon(icon, color: fg, size: 27),
         ],
       ),
     );
@@ -1187,10 +1192,8 @@ class _FuelStopBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isBeyondEnd = _isStopBeyondRaceEnd();
-    final lapText = !hasData
-        ? '---'
-        : stopLap <= 0
-        ? '___'
+    final lapText = !hasData || stopLap <= 0
+        ? '???'
         : isBeyondEnd
         ? 'NO STOP'
         : 'L $stopLap';
@@ -1203,7 +1206,7 @@ class _FuelStopBox extends StatelessWidget {
             lapText,
             style: const TextStyle(
               color: Color(0xFFFF6F00),
-              fontSize: 16,
+              fontSize: UiConstants.bigFontSize,
               fontWeight: FontWeight.bold,
               fontFamily: 'RobotoMono',
             ),
@@ -1212,7 +1215,7 @@ class _FuelStopBox extends StatelessWidget {
             'NEXT STOP',
             style: TextStyle(
               color: Color(0xFFFF6F00),
-              fontSize: 27, // 9 * 3
+              fontSize: UiConstants.smallFontSize, // 9 * 3
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1239,7 +1242,7 @@ class _RemainingStopsBox extends StatelessWidget {
             hasData ? '$stops' : '00',
             style: const TextStyle(
               color: Color(0xFFFF6F00),
-              fontSize: 16,
+              fontSize: UiConstants.bigFontSize,
               fontWeight: FontWeight.bold,
               fontFamily: 'RobotoMono',
             ),
@@ -1248,7 +1251,7 @@ class _RemainingStopsBox extends StatelessWidget {
             'TOT STOPS',
             style: TextStyle(
               color: Color(0xFFFF6F00),
-              fontSize: 27, // 9 * 3
+              fontSize: UiConstants.smallFontSize, // 9 * 3
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -2333,7 +2336,7 @@ Color _tyreTone(
   required int hotMax,
 }) {
   if (temperature <= 0) {
-    return const Color(0xFF888888);
+    return const Color(0xFF44444A);
   }
   if (temperature < coldMax) {
     return const Color(0xFF1E88E5); // blue — cold
@@ -2342,7 +2345,7 @@ Color _tyreTone(
     return const Color(0xFF43A047); // green — optimal
   }
   if (temperature < hotMax) {
-    return const Color(0xFFFDD835); // yellow — hot
+    return const Color(0xFFFD7435); // yellow — hot
   }
   return const Color(0xFFE53935); // red — overheated
 }
@@ -2374,7 +2377,7 @@ Map<int, double> _raceDeltaByLap(RaceViewState race) {
 
 String _temperatureLabel(double value) {
   if (value <= 0) {
-    return '--';
+    return '??';
   }
   return '${value.toStringAsFixed(1)}°';
 }
