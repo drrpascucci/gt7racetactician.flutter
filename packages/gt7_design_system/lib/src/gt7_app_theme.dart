@@ -133,15 +133,15 @@ final class Gt7AppTheme {
         hintStyle: textTheme.bodyMedium?.copyWith(color: gt7Theme.textMuted),
         labelStyle: textTheme.labelLarge?.copyWith(color: gt7Theme.description),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Gt7Spacing.radiusMedium),
+          borderRadius: BorderRadius.circular(4),
           borderSide: BorderSide(color: gt7Theme.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Gt7Spacing.radiusMedium),
+          borderRadius: BorderRadius.circular(4),
           borderSide: BorderSide(color: gt7Theme.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(Gt7Spacing.radiusMedium),
+          borderRadius: BorderRadius.circular(4),
           borderSide: BorderSide(color: gt7Theme.highlight, width: 2),
         ),
       ),

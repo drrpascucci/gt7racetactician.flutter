@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:gt7_design_system/gt7_design_system.dart';
 import 'package:gt7_domain/gt7_domain.dart';
 
+
 import '../config/app_config.dart';
 import 'app_runtime_controller.dart';
 import 'app_runtime_models.dart';
 import 'ui_constants.dart';
+
 
 Future<void> _openSettingsScreen(
   BuildContext context,
@@ -182,7 +184,7 @@ class _DiscoveryStageState extends State<_DiscoveryStage> {
                   vertical: Gt7Spacing.sm,
                 ),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.zero,
+                  borderRadius: BorderRadius.all(Radius.circular(4)),
                   borderSide: BorderSide.none,
                 ),
                 hintText: '192.168.1.9',
@@ -191,7 +193,7 @@ class _DiscoveryStageState extends State<_DiscoveryStage> {
             ),
           ),
           const SizedBox(height: Gt7Spacing.lg),
-          Gt7PillButton(
+          _AppButton(
             label: widget.connection.phase == RuntimeConnectionPhase.discovering
                 ? 'Searching...'
                 : 'Search PS',
@@ -205,14 +207,19 @@ class _DiscoveryStageState extends State<_DiscoveryStage> {
             spacing: Gt7Spacing.md,
             runSpacing: Gt7Spacing.sm,
             children: [
-              Gt7PillButton(
+              _AppButton(
+                label: 'Exit',
+                onPressed: () => exit(0),
+                backgroundColor: const Color(0xFFCC0000),
+                foregroundColor: Colors.white,
+                borderColor: const Color(0xFFFF4444),
+              ),
+              _AppButton(
                 label: "Let's GO!",
                 onPressed: widget.connection.isBusy ? null : _applyManualIp,
-              ),
-              Gt7PillButton(
-                label: 'Exit',
-                variant: Gt7ButtonVariant.danger,
-                onPressed: () => exit(0),
+                backgroundColor: const Color(0xFF388E3C),
+                foregroundColor: Colors.white,
+                borderColor: const Color(0xFF4CAF50),
               ),
             ],
           ),
@@ -442,6 +449,13 @@ class _DashboardToolbar extends StatelessWidget {
         : phase == RuntimeConnectionPhase.error
         ? '⚠ RETRY'
         : '▶ START SIM';
+    final simBtnBorder = isLive
+        ? const Color(0xFFFF4444)
+        : phase == RuntimeConnectionPhase.connecting
+        ? const Color(0xFFFFBB33)
+        : phase == RuntimeConnectionPhase.error
+        ? const Color(0xFFFF4444)
+        : const Color(0xFF555555);
 
     return Container(
       color: const Color(0xFF1E1E1E),
@@ -454,28 +468,13 @@ class _DashboardToolbar extends StatelessWidget {
             fit: FlexFit.loose,
             child: Tooltip(
               message: _telemetryControlTooltip(phase),
-              child: ElevatedButton(
+              child: _AppButton(
+                label: simBtnLabel,
                 onPressed: isBusy ? null : controller.toggleTelemetry,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: simBtnBg,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  minimumSize: const Size(0, 40),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                    side: BorderSide(
-                      color: isLive
-                          ? const Color(0xFFFF4444)
-                          : const Color(0xFF555555),
-                    ),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                child: Text(simBtnLabel, overflow: TextOverflow.ellipsis),
+                backgroundColor: simBtnBg,
+                foregroundColor: Colors.white,
+                borderColor: simBtnBorder,
+                compact: true,
               ),
             ),
           ),
@@ -485,24 +484,10 @@ class _DashboardToolbar extends StatelessWidget {
             fit: FlexFit.loose,
             child: Tooltip(
               message: 'Reset session',
-              child: ElevatedButton(
+              child: _AppButton(
+                label: '▶ REPLAY',
                 onPressed: controller.resetSession,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF333333),
-                  foregroundColor: const Color(0xFFAAAAAA),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  minimumSize: const Size(0, 40),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                    side: const BorderSide(color: Color(0xFF555555)),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                child: const Text('▶ REPLAY', overflow: TextOverflow.ellipsis),
+                compact: true,
               ),
             ),
           ),
@@ -512,24 +497,10 @@ class _DashboardToolbar extends StatelessWidget {
             fit: FlexFit.loose,
             child: Tooltip(
               message: 'Change PlayStation',
-              child: ElevatedButton(
+              child: _AppButton(
+                label: '🎮 FIND PS',
                 onPressed: controller.changePlaystation,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF333333),
-                  foregroundColor: const Color(0xFFAAAAAA),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  minimumSize: const Size(0, 40),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                    side: const BorderSide(color: Color(0xFF555555)),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                child: const Text('🎮 FIND PS', overflow: TextOverflow.ellipsis),
+                compact: true,
               ),
             ),
           ),
@@ -539,24 +510,10 @@ class _DashboardToolbar extends StatelessWidget {
             fit: FlexFit.loose,
             child: Tooltip(
               message: 'Reconnect',
-              child: ElevatedButton(
+              child: _AppButton(
+                label: '🔄 RELOAD',
                 onPressed: isBusy ? null : controller.reconnect,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF333333),
-                  foregroundColor: const Color(0xFFAAAAAA),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  minimumSize: const Size(0, 40),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                    side: const BorderSide(color: Color(0xFF555555)),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                child: const Text('🔄 RELOAD', overflow: TextOverflow.ellipsis),
+                compact: true,
               ),
             ),
           ),
@@ -566,24 +523,10 @@ class _DashboardToolbar extends StatelessWidget {
             fit: FlexFit.loose,
             child: Tooltip(
               message: 'Open settings',
-              child: ElevatedButton(
+              child: _AppButton(
+                label: '⚙ SETTINGS',
                 onPressed: () => _openSettingsScreen(context, controller),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF333333),
-                  foregroundColor: const Color(0xFFAAAAAA),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  minimumSize: const Size(0, 40),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                    side: const BorderSide(color: Color(0xFF555555)),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                child: const Text('⚙ SETTINGS', overflow: TextOverflow.ellipsis),
+                compact: true,
               ),
             ),
           ),
@@ -1016,7 +959,7 @@ class _SmartphoneDashboard extends StatelessWidget {
               Expanded(
                 child: _TyreTile(
                   label: 'FL',
-                  temp: temps.frontLeft,
+                  temp: temps.isEmpty ? 80 : temps.frontLeft,
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
@@ -1027,7 +970,7 @@ class _SmartphoneDashboard extends StatelessWidget {
               Expanded(
                 child: _TyreTile(
                   label: 'FR',
-                  temp: temps.frontRight,
+                  temp: temps.isEmpty ? 80 : temps.frontRight,
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
@@ -1064,7 +1007,7 @@ class _SmartphoneDashboard extends StatelessWidget {
               Expanded(
                 child: _TyreTile(
                   label: 'RL',
-                  temp: temps.rearLeft,
+                  temp: temps.isEmpty ? 80 : temps.rearLeft,
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
@@ -1075,7 +1018,7 @@ class _SmartphoneDashboard extends StatelessWidget {
               Expanded(
                 child: _TyreTile(
                   label: 'RR',
-                  temp: temps.rearRight,
+                  temp: temps.isEmpty ? 80 : temps.rearRight,
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
@@ -1438,6 +1381,13 @@ class _ConnectionPanelState extends State<_ConnectionPanel> {
             decoration: const InputDecoration(
               labelText: 'Manual PlayStation IP',
               hintText: '192.168.0.10',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(color: Colors.white24),
+              ),
             ),
           ),
           const SizedBox(height: Gt7Spacing.sm),
@@ -1452,17 +1402,16 @@ class _ConnectionPanelState extends State<_ConnectionPanel> {
             spacing: Gt7Spacing.sm,
             runSpacing: Gt7Spacing.sm,
             children: [
-              Gt7PillButton(
+              _AppButton(
                 label: 'Apply manual IP',
                 onPressed: _applyManualIp,
-                variant: Gt7ButtonVariant.secondary,
               ),
-              Gt7PillButton(label: 'Auto discovery', onPressed: _clearManualIp),
-              Gt7PillButton(
+              _AppButton(label: 'Auto discovery', onPressed: _clearManualIp),
+              _AppButton(
                 label: 'Reconnect',
                 onPressed: widget.controller.reconnect,
               ),
-              Gt7PillButton(
+              _AppButton(
                 label: 'Change PlayStation',
                 onPressed: _changePlaystation,
               ),
@@ -1652,47 +1601,80 @@ class _LapTableValueCell extends StatelessWidget {
   }
 }
 
-class _RuntimeSettingsScreen extends StatelessWidget {
+class _RuntimeSettingsScreen extends StatefulWidget {
   const _RuntimeSettingsScreen({required this.controller});
 
   final AppRuntimeController controller;
 
   @override
+  State<_RuntimeSettingsScreen> createState() => _RuntimeSettingsScreenState();
+}
+
+class _RuntimeSettingsScreenState extends State<_RuntimeSettingsScreen> {
+  final _raceSettingsKey = GlobalKey<_RaceSettingsPanelState>();
+
+  @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: Listenable.merge([
-        controller,
-        controller.configService,
-        controller.telemetryState,
+        widget.controller,
+        widget.controller.configService,
+        widget.controller.telemetryState,
       ]),
       builder: (context, _) {
-        final config = controller.configService.config;
+        final config = widget.controller.configService.config;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Settings')),
+          appBar: AppBar(
+            title: const Text('GT7 Race Tactician Settings'),
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
           body: SafeArea(
             child: ListView(
               padding: Gt7Spacing.screenInsets,
               children: [
-                _SettingsOverviewPanel(
-                  config: config,
-                  connection: controller.connectionState,
-                  telemetry: controller.telemetryState.value,
+                Text(
+                  'GT7 RACE TACTICIAN SETTINGS',
+                  style: TextStyle(
+                    color: context.gt7Theme.highlight,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'RobotoMono',
+                    letterSpacing: 1.2,
+                  ),
                 ),
                 const SizedBox(height: Gt7Spacing.lg),
                 _RaceSettingsPanel(
+                  key: _raceSettingsKey,
                   initialConfig: config,
-                  onSave: controller.updateConfig,
+                  onSave: widget.controller.updateConfig,
                 ),
                 const SizedBox(height: Gt7Spacing.lg),
                 _ConnectionPanel(
-                  controller: controller,
+                  controller: widget.controller,
                   config: config,
-                  telemetry: controller.telemetryState.value,
-                  connection: controller.connectionState,
+                  telemetry: widget.controller.telemetryState.value,
+                  connection: widget.controller.connectionState,
                 ),
                 const SizedBox(height: Gt7Spacing.lg),
-                _DebugTelemetryPanel(controller: controller, config: config),
+                _DebugTelemetryPanel(controller: widget.controller, config: config),
+                const SizedBox(height: Gt7Spacing.xl),
+                Align(
+                  alignment: Alignment.center,
+                  child: _AppButton(
+                    label: 'Apply & Close',
+                    onPressed: () async {
+                      await _raceSettingsKey.currentState?.save();
+                      if (mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    backgroundColor: const Color(0xFF388E3C),
+                    foregroundColor: Colors.white,
+                    borderColor: Gt7Colors.border,
+                  ),
+                ),
+                const SizedBox(height: Gt7Spacing.xl * 2),
               ],
             ),
           ),
@@ -1804,7 +1786,12 @@ class _DebugTelemetryPanel extends StatelessWidget {
           DropdownButtonFormField<double>(
             key: ValueKey<double>(selectedSpeed),
             initialValue: selectedSpeed,
-            decoration: const InputDecoration(labelText: 'Replay speed'),
+            decoration: const InputDecoration(
+              labelText: 'Replay speed',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+            ),
             items: speedOptions
                 .map(
                   (value) => DropdownMenuItem<double>(
@@ -1827,13 +1814,13 @@ class _DebugTelemetryPanel extends StatelessWidget {
             spacing: Gt7Spacing.md,
             runSpacing: Gt7Spacing.md,
             children: [
-              ElevatedButton(
+              _AppButton(
                 onPressed: () async {
                   await controller.startReplay(
                     speedMultiplier: config.replaySpeedMultiplier,
                   );
                 },
-                child: const Text('Replay last session'),
+                label: 'Replay last session',
               ),
               if (controller.isReplayMode)
                 TextButton(
@@ -1848,59 +1835,6 @@ class _DebugTelemetryPanel extends StatelessWidget {
   }
 }
 
-class _SettingsOverviewPanel extends StatelessWidget {
-  const _SettingsOverviewPanel({
-    required this.config,
-    required this.connection,
-    required this.telemetry,
-  });
-
-  final AppConfig config;
-  final RuntimeConnectionState connection;
-  final TelemetryViewState telemetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Gt7Panel(
-      title: 'Session setup',
-      subtitle:
-          'Race targets, shift point, connection preferences and debug tools live here.',
-      trailing: _StatusBadge(
-        label: connection.phase.name.toUpperCase(),
-        color: _connectionColor(context, connection.phase),
-      ),
-      child: Wrap(
-        spacing: Gt7Spacing.md,
-        runSpacing: Gt7Spacing.md,
-        children: [
-          _MetricTile(label: 'Track', value: config.trackName),
-          _MetricTile(
-            label: 'Race type',
-            value: _raceTypeLabel(config.raceType),
-          ),
-          _MetricTile(
-            label: 'Target',
-            value: config.raceType == RaceType.timeRace
-                ? '${config.targetRaceTime.inMinutes} min'
-                : '${config.targetLaps} laps',
-          ),
-          _MetricTile(label: 'Shift %', value: '${config.shiftPercentage}%'),
-          _MetricTile(
-            label: 'Manual IP',
-            value: config.normalizedManualPlaystationIp ?? 'Auto discovery',
-          ),
-          _MetricTile(
-            label: 'Packets',
-            value: '${telemetry.packetsReceived}',
-            tone: telemetry.packetsReceived > 0
-                ? context.gt7Theme.telemetry
-                : context.gt7Theme.description,
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _MetricTile extends StatelessWidget {
   const _MetricTile({required this.label, required this.value, this.tone});
@@ -1977,7 +1911,7 @@ class _StatusBadge extends StatelessWidget {
 }
 
 class _RaceSettingsPanel extends StatefulWidget {
-  const _RaceSettingsPanel({required this.initialConfig, required this.onSave});
+  const _RaceSettingsPanel({super.key, required this.initialConfig, required this.onSave});
 
   final AppConfig initialConfig;
   final Future<void> Function(AppConfig config) onSave;
@@ -2009,11 +1943,11 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
     _pitLaneController = TextEditingController(
       text: '${config.pitLaneTime.inSeconds}',
     );
-    _shiftPercentage = config.shiftPercentage.toDouble();
+    _shiftPercentage = config.shiftPercentage.toDouble().clamp(75.0, 100.0);
     _raceType = config.raceType;
-    _tyreColdMax = config.tyreColdMax.toDouble();
-    _tyreOptimalMax = config.tyreOptimalMax.toDouble();
-    _tyreHotMax = config.tyreHotMax.toDouble();
+    _tyreColdMax = config.tyreColdMax.toDouble().clamp(40.0, 150.0);
+    _tyreOptimalMax = config.tyreOptimalMax.toDouble().clamp(40.0, 150.0);
+    _tyreHotMax = config.tyreHotMax.toDouble().clamp(40.0, 150.0);
   }
 
   @override
@@ -2033,27 +1967,27 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
       _pitLaneController.text = '${config.pitLaneTime.inSeconds}';
     }
     // Only resync slider when persisted value actually changed (not during drag)
-    if (config.shiftPercentage.toDouble() != _shiftPercentage &&
+    if (config.shiftPercentage.toDouble().clamp(75.0, 100.0) != _shiftPercentage &&
         config.shiftPercentage.toDouble() !=
             oldWidget.initialConfig.shiftPercentage) {
-      _shiftPercentage = config.shiftPercentage.toDouble();
+      _shiftPercentage = config.shiftPercentage.toDouble().clamp(75.0, 100.0);
     }
     if (_raceType != config.raceType) {
       _raceType = config.raceType;
     }
     // Only resync sliders when persisted value actually changed (not during drag)
-    if (config.tyreColdMax.toDouble() != _tyreColdMax &&
+    if (config.tyreColdMax.toDouble().clamp(40.0, 150.0) != _tyreColdMax &&
         config.tyreColdMax.toDouble() != oldWidget.initialConfig.tyreColdMax) {
-      _tyreColdMax = config.tyreColdMax.toDouble();
+      _tyreColdMax = config.tyreColdMax.toDouble().clamp(40.0, 150.0);
     }
-    if (config.tyreOptimalMax.toDouble() != _tyreOptimalMax &&
+    if (config.tyreOptimalMax.toDouble().clamp(40.0, 150.0) != _tyreOptimalMax &&
         config.tyreOptimalMax.toDouble() !=
             oldWidget.initialConfig.tyreOptimalMax) {
-      _tyreOptimalMax = config.tyreOptimalMax.toDouble();
+      _tyreOptimalMax = config.tyreOptimalMax.toDouble().clamp(40.0, 150.0);
     }
-    if (config.tyreHotMax.toDouble() != _tyreHotMax &&
+    if (config.tyreHotMax.toDouble().clamp(40.0, 150.0) != _tyreHotMax &&
         config.tyreHotMax.toDouble() != oldWidget.initialConfig.tyreHotMax) {
-      _tyreHotMax = config.tyreHotMax.toDouble();
+      _tyreHotMax = config.tyreHotMax.toDouble().clamp(40.0, 150.0);
     }
   }
 
@@ -2077,12 +2011,22 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
           TextField(
             controller: _trackController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Track name'),
+            decoration: const InputDecoration(
+              labelText: 'Track name',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+            ),
           ),
           const SizedBox(height: Gt7Spacing.md),
           DropdownButtonFormField<RaceType>(
             initialValue: _raceType,
-            decoration: const InputDecoration(labelText: 'Race type'),
+            decoration: const InputDecoration(
+              labelText: 'Race type',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+            ),
             items: RaceType.values
                 .where((value) => value != RaceType.undefined)
                 .map(
@@ -2108,7 +2052,12 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
                 child: TextField(
                   controller: _lapsController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Target laps'),
+                  decoration: const InputDecoration(
+                    labelText: 'Target laps',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: Gt7Spacing.md),
@@ -2120,6 +2069,9 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
                     labelText: _raceType == RaceType.timeRace
                         ? 'Total minutes'
                         : 'Target minutes',
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
                   ),
                 ),
               ),
@@ -2134,6 +2086,9 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Pit lane seconds',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
                   ),
                 ),
               ),
@@ -2151,7 +2106,7 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
                     ),
                     Expanded(
                       child: Slider(
-                        value: _shiftPercentage,
+                        value: _shiftPercentage.clamp(75.0, 100.0),
                         min: 75,
                         max: 100,
                         divisions: 25,
@@ -2185,7 +2140,7 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
               ),
               Expanded(
                 child: Slider(
-                  value: _tyreColdMax,
+                  value: _tyreColdMax.clamp(40.0, 150.0),
                   min: 40,
                   max: 150,
                   divisions: 110,
@@ -2214,7 +2169,7 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
               ),
               Expanded(
                 child: Slider(
-                  value: _tyreOptimalMax,
+                  value: _tyreOptimalMax.clamp(40.0, 150.0),
                   min: 40,
                   max: 150,
                   divisions: 110,
@@ -2243,7 +2198,7 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
               ),
               Expanded(
                 child: Slider(
-                  value: _tyreHotMax,
+                  value: _tyreHotMax.clamp(40.0, 150.0),
                   min: 40,
                   max: 150,
                   divisions: 110,
@@ -2260,17 +2215,12 @@ class _RaceSettingsPanelState extends State<_RaceSettingsPanel> {
               ),
             ],
           ),
-          const SizedBox(height: Gt7Spacing.lg),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Gt7PillButton(label: 'Save settings', onPressed: _save),
-          ),
         ],
       ),
     );
   }
 
-  Future<void> _save() async {
+  Future<void> save() async {
     final original = widget.initialConfig;
     await widget.onSave(
       original.copyWith(
@@ -2447,4 +2397,48 @@ String _formatAdaptiveSignedDurationMs(
   final seconds = milliseconds.abs() / 1000;
   final precision = seconds >= 10 ? 1 : 2;
   return '$sign${seconds.toStringAsFixed(precision)}';
+}
+
+class _AppButton extends StatelessWidget {
+  const _AppButton({
+    required this.label,
+    required this.onPressed,
+    this.backgroundColor = const Color(0xFF333333),
+    this.foregroundColor = const Color(0xFFAAAAAA),
+    this.borderColor = const Color(0xFF555555),
+    this.compact = false,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final Color borderColor;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 12 : 16,
+          vertical: compact ? 8 : 12,
+        ),
+        minimumSize: Size(0, compact ? 40 : 44),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+          side: BorderSide(color: borderColor),
+        ),
+        textStyle: TextStyle(
+          fontSize: compact ? 11 : 13,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      child: Text(label, overflow: TextOverflow.ellipsis),
+    );
+  }
 }

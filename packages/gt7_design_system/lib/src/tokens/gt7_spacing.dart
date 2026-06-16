@@ -11,9 +11,9 @@ final class Gt7Spacing {
   static const double xl = 24;
   static const double xxl = 32;
 
-  static const double radiusSmall = 12;
-  static const double radiusMedium = 16;
-  static const double radiusPanel = 20;
+  static const double radiusSmall = 4;
+  static const double radiusMedium = 4;
+  static const double radiusPanel = 12;
   static const double radiusPill = 999;
 
   static const double buttonHeightSmall = 44;
