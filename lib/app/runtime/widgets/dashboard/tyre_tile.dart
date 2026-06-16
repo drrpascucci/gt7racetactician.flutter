@@ -1,0 +1,75 @@
+import 'package:flutter/material.dart';
+
+import '../../app_runtime_models.dart';
+import '../../../config/app_config.dart';
+import '../../ui_constants.dart';
+import '../runtime_ui_utils.dart';
+
+class TyreTile extends StatelessWidget {
+  const TyreTile({
+    super.key,
+    required this.label,
+    required this.temp,
+    required this.coldMax,
+    required this.optimalMax,
+    required this.hotMax,
+    required this.viewMode,
+  });
+
+  final String label;
+  final double temp;
+  final int coldMax;
+  final int optimalMax;
+  final int hotMax;
+  final DashboardViewMode viewMode;
+
+  @override
+  Widget build(BuildContext context) {
+    final tone = tyreTone(
+      temp,
+      coldMax: coldMax,
+      optimalMax: optimalMax,
+      hotMax: hotMax,
+    );
+
+    // Determine corner position: FL=top-left, FR=top-right, RL=bottom-left, RR=bottom-right
+    final bool isTopCorner = label == 'FL' || label == 'FR';
+    final bool isLeftCorner = label == 'FL' || label == 'RL';
+
+    final isBright = tone.computeLuminance() > 0.5;
+    final contentColor = isBright ? Colors.black : Colors.white;
+    final labelColor = isBright ? Colors.black54 : Colors.white70;
+
+    return Container(
+      color: tone,
+      child: Stack(
+        children: [
+          Positioned(
+            top: isTopCorner ? 4 : null,
+            bottom: isTopCorner ? null : 4,
+            left: isLeftCorner ? 6 : null,
+            right: isLeftCorner ? null : 6,
+            child: Text(
+              label,
+              style: TextStyle(
+                color: labelColor,
+                fontSize: UiConstants.smallFontSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Center(
+            child: Text(
+              temperatureLabel(temp),
+              style: TextStyle(
+                color: contentColor,
+                fontSize: UiConstants.getBigFontSize(viewMode),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
