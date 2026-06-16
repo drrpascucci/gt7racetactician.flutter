@@ -841,6 +841,7 @@ class _TyreSection extends StatelessWidget {
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
+                  viewMode: config.viewMode,
                 ),
               ),
               Container(width: 1, color: const Color(0xFF333333)),
@@ -851,6 +852,7 @@ class _TyreSection extends StatelessWidget {
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
+                  viewMode: config.viewMode,
                 ),
               ),
             ],
@@ -868,6 +870,7 @@ class _TyreSection extends StatelessWidget {
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
+                  viewMode: config.viewMode,
                 ),
               ),
               Container(width: 1, color: const Color(0xFF333333)),
@@ -878,6 +881,7 @@ class _TyreSection extends StatelessWidget {
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
+                  viewMode: config.viewMode,
                 ),
               ),
             ],
@@ -895,6 +899,7 @@ class _TyreTile extends StatelessWidget {
     required this.coldMax,
     required this.optimalMax,
     required this.hotMax,
+    required this.viewMode,
   });
 
   final String label;
@@ -902,6 +907,7 @@ class _TyreTile extends StatelessWidget {
   final int coldMax;
   final int optimalMax;
   final int hotMax;
+  final DashboardViewMode viewMode;
 
   @override
   Widget build(BuildContext context) {
@@ -943,7 +949,7 @@ class _TyreTile extends StatelessWidget {
               _temperatureLabel(temp),
               style: TextStyle(
                 color: contentColor,
-                fontSize: UiConstants.bigFontSize,
+                fontSize: UiConstants.getBigFontSize(viewMode),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -1014,6 +1020,7 @@ class _SmartphoneDashboard extends StatelessWidget {
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
+                  viewMode: config.viewMode,
                 ),
               ),
               Container(width: 1, color: sep),
@@ -1024,6 +1031,7 @@ class _SmartphoneDashboard extends StatelessWidget {
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
+                  viewMode: config.viewMode,
                 ),
               ),
             ],
@@ -1060,6 +1068,7 @@ class _SmartphoneDashboard extends StatelessWidget {
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
+                  viewMode: config.viewMode,
                 ),
               ),
               Container(width: 1, color: sep),
@@ -1070,6 +1079,7 @@ class _SmartphoneDashboard extends StatelessWidget {
                   coldMax: config.tyreColdMax,
                   optimalMax: config.tyreOptimalMax,
                   hotMax: config.tyreHotMax,
+                  viewMode: config.viewMode,
                 ),
               ),
             ],
@@ -1142,7 +1152,7 @@ class _DeltaBox extends StatelessWidget {
                 : '0.000',
             style: TextStyle(
               color: fg,
-              fontSize: UiConstants.bigFontSize,
+              fontSize: UiConstants.compactBigFontSize,
               fontWeight: FontWeight.bold,
               fontFamily: 'RobotoMono',
             ),
@@ -1205,8 +1215,8 @@ class _FuelStopBox extends StatelessWidget {
           Text(
             lapText,
             style: const TextStyle(
-              color: Color(0xFFFF6F00),
-              fontSize: UiConstants.bigFontSize,
+              color: Gt7Colors.lapsForeColor,
+              fontSize: UiConstants.compactBigFontSize,
               fontWeight: FontWeight.bold,
               fontFamily: 'RobotoMono',
             ),
@@ -1214,7 +1224,7 @@ class _FuelStopBox extends StatelessWidget {
           const Text(
             'NEXT STOP',
             style: TextStyle(
-              color: Color(0xFFFF6F00),
+              color: Gt7Colors.lapsForeColor,
               fontSize: UiConstants.smallFontSize, // 9 * 3
               fontWeight: FontWeight.bold,
             ),
@@ -1241,8 +1251,8 @@ class _RemainingStopsBox extends StatelessWidget {
           Text(
             hasData ? '$stops' : '00',
             style: const TextStyle(
-              color: Color(0xFFFF6F00),
-              fontSize: UiConstants.bigFontSize,
+              color: Gt7Colors.lapsForeColor,
+              fontSize: UiConstants.compactBigFontSize,
               fontWeight: FontWeight.bold,
               fontFamily: 'RobotoMono',
             ),
@@ -1250,7 +1260,7 @@ class _RemainingStopsBox extends StatelessWidget {
           const Text(
             'TOT STOPS',
             style: TextStyle(
-              color: Color(0xFFFF6F00),
+              color: Gt7Colors.lapsForeColor,
               fontSize: UiConstants.smallFontSize, // 9 * 3
               fontWeight: FontWeight.bold,
             ),
@@ -2336,18 +2346,18 @@ Color _tyreTone(
   required int hotMax,
 }) {
   if (temperature <= 0) {
-    return const Color(0xFF44444A);
+    return Gt7Colors.undefinedTempColor;
   }
   if (temperature < coldMax) {
-    return const Color(0xFF1E88E5); // blue — cold
+    return Gt7Colors.coldTempColor; // blue — cold
   }
   if (temperature < optimalMax) {
-    return const Color(0xFF43A047); // green — optimal
+    return Gt7Colors.optimalTempColor; // green — optimal
   }
   if (temperature < hotMax) {
-    return const Color(0xFFFD7435); // yellow — hot
+    return Gt7Colors.hotTempColor; // yellow — hot
   }
-  return const Color(0xFFE53935); // red — overheated
+  return Gt7Colors.overheatedTempColor; // red — overheated
 }
 
 Color _deltaTone(BuildContext context, double milliseconds) {

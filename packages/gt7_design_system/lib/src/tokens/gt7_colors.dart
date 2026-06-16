@@ -29,4 +29,11 @@ final class Gt7Colors {
   static const danger = Color(0xFFFF0000);
   static const ledOff = Color(0xFF111111);
   static const ledOutline = Color(0xFF333333);
+
+  static const Color lapsForeColor = Color(0xFFFF6F00);
+  static const Color coldTempColor = Color(0xFF1E88E5);
+  static const Color optimalTempColor = Color(0xFF43A047);
+  static const Color hotTempColor = Color(0xFFE4A308);
+  static const Color overheatedTempColor = Color(0xFFE53935);
+  static const Color undefinedTempColor = Color(0xFF44444A);
 }
