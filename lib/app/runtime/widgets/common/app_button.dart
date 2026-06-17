@@ -26,10 +26,10 @@ class AppButton extends StatelessWidget {
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
         padding: EdgeInsets.symmetric(
-          horizontal: compact ? 12 : 16,
-          vertical: compact ? 8 : 12,
+          horizontal: compact ? 8 : 12,
+          vertical: compact ? 4 : 8,
         ),
-        minimumSize: Size(0, compact ? 40 : 44),
+        minimumSize: Size(0, compact ? 32 : 40),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
@@ -40,7 +40,7 @@ class AppButton extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      child: Text(label, overflow: TextOverflow.ellipsis),
+      child: Text(label),
     );
   }
 }

@@ -38,12 +38,12 @@ class DashboardToolbar extends StatelessWidget {
         ? const Color(0xFFCC4400)
         : const Color(0xFF333333);
     final simBtnLabel = isLive
-        ? '■ STOP SIM'
+        ? '■ STOP'
         : phase == RuntimeConnectionPhase.connecting
         ? '⏳ CONNECTING'
         : phase == RuntimeConnectionPhase.error
         ? '⚠ RETRY'
-        : '▶ START SIM';
+        : '▶ START';
     final simBtnBorder = isLive
         ? const Color(0xFFFF4444)
         : phase == RuntimeConnectionPhase.connecting
@@ -54,75 +54,28 @@ class DashboardToolbar extends StatelessWidget {
 
     return Container(
       color: const Color(0xFF1E1E1E),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          // START SIM - main action button
-          Flexible(
-            fit: FlexFit.loose,
-            child: Tooltip(
-              message: telemetryControlTooltip(phase),
-              child: AppButton(
-                label: simBtnLabel,
-                onPressed: isBusy ? null : controller.toggleTelemetry,
-                backgroundColor: simBtnBg,
-                foregroundColor: Colors.white,
-                borderColor: simBtnBorder,
-                compact: true,
-              ),
-            ),
-          ),
-          const SizedBox(width: 4),
-          // REPLAY
-          Flexible(
-            fit: FlexFit.loose,
-            child: Tooltip(
-              message: 'Reset session',
-              child: AppButton(
-                label: '▶ REPLAY',
-                onPressed: controller.resetSession,
-                compact: true,
-              ),
-            ),
-          ),
-          const SizedBox(width: 4),
-          // FIND PS
-          Flexible(
-            fit: FlexFit.loose,
-            child: Tooltip(
-              message: 'Change PlayStation',
-              child: AppButton(
-                label: '🎮 FIND PS',
-                onPressed: controller.changePlaystation,
-                compact: true,
-              ),
-            ),
-          ),
-          const SizedBox(width: 4),
-          // RELOAD
-          Flexible(
-            fit: FlexFit.loose,
-            child: Tooltip(
-              message: 'Reconnect',
-              child: AppButton(
-                label: '🔄 RELOAD',
-                onPressed: isBusy ? null : controller.reconnect,
-                compact: true,
-              ),
-            ),
-          ),
-          const SizedBox(width: 4),
           // SETTINGS
-          Flexible(
-            fit: FlexFit.loose,
-            child: Tooltip(
-              message: 'Open settings',
-              child: AppButton(
-                label: '⚙ SETTINGS',
-                onPressed: () => openSettingsScreen(context, controller),
-                compact: true,
-              ),
+          Tooltip(
+            message: 'Open settings',
+            child: AppButton(
+              label: '⚙ SETTINGS',
+              onPressed: () => openSettingsScreen(context, controller),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // START - main action button
+          Tooltip(
+            message: telemetryControlTooltip(phase),
+            child: AppButton(
+              label: simBtnLabel,
+              onPressed: isBusy ? null : controller.toggleTelemetry,
+              backgroundColor: simBtnBg,
+              foregroundColor: Colors.white,
+              borderColor: simBtnBorder,
             ),
           ),
         ],

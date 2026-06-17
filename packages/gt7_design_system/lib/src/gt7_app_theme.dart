@@ -75,6 +75,7 @@ final class Gt7AppTheme {
       useMaterial3: true,
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
+      fontFamily: 'Roboto Mono',
       textTheme: textTheme,
       scaffoldBackgroundColor: gt7Theme.background,
       canvasColor: gt7Theme.background,
@@ -129,19 +130,19 @@ final class Gt7AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: gt7Theme.panel,
+        fillColor: Colors.black,
         hintStyle: textTheme.bodyMedium?.copyWith(color: gt7Theme.textMuted),
         labelStyle: textTheme.labelLarge?.copyWith(color: gt7Theme.description),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide(color: gt7Theme.border),
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4)),
+          borderSide: BorderSide(color: Color(0xFF333333)),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide(color: gt7Theme.border),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4)),
+          borderSide: BorderSide(color: Color(0xFF333333)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: const BorderRadius.all(Radius.circular(4)),
           borderSide: BorderSide(color: gt7Theme.highlight, width: 2),
         ),
       ),

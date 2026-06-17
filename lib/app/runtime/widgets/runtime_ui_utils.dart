@@ -46,12 +46,17 @@ Color tyreTone(
   return Gt7Colors.overheatedTempColor; // red — overheated
 }
 
-Color deltaTone(BuildContext context, double milliseconds) {
-  final gt7 = context.gt7Theme;
+Color deltaTone(BuildContext context, double milliseconds, [double? targetMs]) {
   if (milliseconds == 0) {
-    return gt7.equal;
+    return Colors.white;
   }
-  return milliseconds < 0 ? gt7.positive : gt7.warning;
+  final threshold = (targetMs ?? 0) * 0.005;
+  if (targetMs != null && targetMs > 0 && milliseconds.abs() <= threshold) {
+    return const Color(0xFF1E88E5); // Blue/Azure — similar
+  }
+  return milliseconds < 0 
+      ? const Color(0xFF43A047) // Green — faster
+      : const Color(0xFFE53935); // Red — slower
 }
 
 Map<int, double> raceDeltaByLap(RaceViewState race) {

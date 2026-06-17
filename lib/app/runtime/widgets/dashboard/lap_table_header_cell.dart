@@ -10,22 +10,19 @@ class LapTableHeaderCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gt7 = context.gt7Theme;
-
-    return ColoredBox(
-      color: gt7.panel,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: Gt7Spacing.xs,
-          vertical: Gt7Spacing.xs,
-        ),
-        child: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Gt7Typography.tableHeader(
-            color ?? gt7.description,
-          ).copyWith(fontSize: 12),
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Gt7Spacing.xs,
+        vertical: Gt7Spacing.xs,
+      ),
+      child: Text(
+        label.toUpperCase(),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: color ?? Colors.grey[400]!,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );

@@ -29,9 +29,9 @@ class Gt7Panel extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: alternate ? gt7.panelAlt : gt7.panel,
+        color: Colors.black,
         borderRadius: BorderRadius.circular(Gt7Spacing.radiusPanel),
-        border: Border.all(color: gt7.border),
+        border: Border.all(color: const Color(0xFF333333)),
       ),
       child: Padding(
         padding: padding,
@@ -42,7 +42,7 @@ class Gt7Panel extends StatelessWidget {
             if (title != null || trailing != null) ...[
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Color(0xFF424242),
+                  color: const Color(0xFF1A1A1A),
                   borderRadius: BorderRadius.circular(Gt7Spacing.radiusPanel),
                 ),
                 child: Padding(
@@ -59,6 +59,7 @@ class Gt7Panel extends StatelessWidget {
                                 title!,
                                 style: textTheme.titleLarge?.copyWith(
                                   color: Colors.white,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             if (subtitle != null) ...[
@@ -86,7 +87,7 @@ class Gt7Panel extends StatelessWidget {
             DefaultTextStyle(
               style: Gt7Typography.textTheme(
                 Theme.of(context).colorScheme,
-              ).bodyLarge!,
+              ).bodyLarge!.copyWith(color: Colors.white),
               child: child,
             ),
           ],

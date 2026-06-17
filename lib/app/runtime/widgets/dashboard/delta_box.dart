@@ -9,70 +9,78 @@ class DeltaBox extends StatelessWidget {
     required this.label,
     required this.deltaMs,
     required this.hasData,
+    this.targetMs = 0,
   });
 
   final String label;
   final double deltaMs;
   final bool hasData;
+  final double targetMs;
 
   @override
   Widget build(BuildContext context) {
-    final Color bg;
-    final Color fg;
+    Color bg;
+    final Color fg = Colors.white;
+    final Color labelColor = Colors.white70;
     final IconData icon;
 
-    if (!hasData) {
+    if (!hasData || targetMs <= 0) {
       bg = const Color(0xFF1A1A1A);
-      fg = const Color(0xFF666666);
       icon = Icons.pending;
-    } else if (deltaMs < -1000) {
-      bg = const Color(0xFF0A2540); // blue — faster
-      fg = const Color(0xFF42A5F5);
-      icon = Icons.arrow_downward;
-    } else if (deltaMs > 1000) {
-      bg = const Color(0xFF3B0000); // red — slower
-      fg = const Color(0xFFEF5350);
-      icon = Icons.arrow_upward;
     } else {
-      bg = const Color(0xFF0D2010); // green — on target
-      fg = const Color(0xFF66BB6A);
-      if (deltaMs > 0) {
+      final threshold = targetMs * 0.005; // 0.5%
+      if (deltaMs < -threshold) {
+        bg = const Color(0xFF43A047); // Green - Faster
         icon = Icons.arrow_downward;
-      } else if (deltaMs < 0) {
+      } else if (deltaMs > threshold) {
+        bg = const Color(0xFFE53935); // Red - Slower
         icon = Icons.arrow_upward;
       } else {
+        bg = const Color(0xFF1E88E5); // Blue - Similar
         icon = Icons.check;
       }
     }
 
     return Container(
-      color: bg,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: const Color(0xFF545454), width: 1),
+      ),
+      child: Stack(
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: fg.withValues(alpha: 0.7),
-              fontSize: UiConstants.smallFontSize, // 9 * 3
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
+          Positioned(
+            top: 4,
+            left: 6,
+            child: Text(
+              label.toUpperCase(),
+              style: TextStyle(
+                color: labelColor,
+                fontSize: 14.4,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
             ),
           ),
-          const SizedBox(height: 2),
-          Text(
-            hasData
-                ? formatAdaptiveSignedDurationMs(deltaMs, compact: true)
-                : '0.000',
-            style: TextStyle(
-              color: fg,
-              fontSize: UiConstants.compactBigFontSize,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'RobotoMono',
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  hasData
+                      ? formatAdaptiveSignedDurationMs(deltaMs, compact: true)
+                      : '0.000',
+                  style: TextStyle(
+                    color: fg,
+                    fontSize: UiConstants.compactBigFontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Icon(icon, color: fg, size: 27),
+              ],
             ),
           ),
-          const SizedBox(height: 2),
-          Icon(icon, color: fg, size: 27),
         ],
       ),
     );

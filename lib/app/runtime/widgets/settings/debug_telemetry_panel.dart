@@ -109,6 +109,7 @@ class DebugTelemetryPanel extends StatelessWidget {
           DropdownButtonFormField<double>(
             key: ValueKey<double>(selectedSpeed),
             value: selectedSpeed,
+            dropdownColor: Colors.black,
             decoration: const InputDecoration(
               labelText: 'Replay speed',
               border: OutlineInputBorder(

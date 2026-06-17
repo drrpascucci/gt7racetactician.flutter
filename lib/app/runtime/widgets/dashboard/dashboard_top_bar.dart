@@ -59,7 +59,7 @@ class DashboardTopBar extends StatelessWidget {
                   style: const TextStyle(
                     color: Color(0xFF00E676),
                     fontSize: 14,
-                    fontFamily: 'RobotoMono',
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 3),

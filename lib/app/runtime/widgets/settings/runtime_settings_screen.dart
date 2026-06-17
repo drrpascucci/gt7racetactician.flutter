@@ -31,12 +31,25 @@ class _RuntimeSettingsScreenState extends State<RuntimeSettingsScreen> {
         final config = widget.controller.configService.config;
 
         return Scaffold(
+          backgroundColor: Colors.black,
           appBar: AppBar(
-            title: const Text('GT7 Race Tactician Settings'),
+            backgroundColor: Colors.black,
+            surfaceTintColor: Colors.transparent,
+            title: const Text(
+              'GT7 Race Tactician Settings',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
             iconTheme: const IconThemeData(color: Colors.white),
           ),
           body: SafeArea(
-            child: ListView(
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                textTheme: Theme.of(context).textTheme.apply(
+                      bodyColor: Colors.white,
+                      displayColor: Colors.white,
+                    ),
+              ),
+              child: ListView(
               padding: Gt7Spacing.screenInsets,
               children: [
                 Text(

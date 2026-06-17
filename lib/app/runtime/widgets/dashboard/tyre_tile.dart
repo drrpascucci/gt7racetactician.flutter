@@ -41,7 +41,11 @@ class TyreTile extends StatelessWidget {
     final labelColor = isBright ? Colors.black54 : Colors.white70;
 
     return Container(
-      color: tone,
+      decoration: BoxDecoration(
+        color: tone,
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: const Color(0xFF545454), width: 1),
+      ),
       child: Stack(
         children: [
           Positioned(

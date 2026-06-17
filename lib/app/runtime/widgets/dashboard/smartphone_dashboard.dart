@@ -35,32 +35,34 @@ class SmartphoneDashboard extends StatelessWidget {
     final remainingStops = (predictedStints.length - 1).clamp(0, 999);
     final hasData = predictedStints.isNotEmpty;
 
-    const sep = Color(0xFF333333);
+    const sep = Colors.black;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Row 1: LAST | AVG | FL | FR
+        // Row 1: LAST LAP | AVG LAP | FL | FR
         Expanded(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
                 child: DeltaBox(
-                  label: 'LAST',
+                  label: 'LAST LAP',
                   deltaMs: lastLapDelta,
                   hasData: hasLastLap,
+                  targetMs: targetLapMs,
                 ),
               ),
-              Container(width: 1, color: sep),
+              const SizedBox(width: 5),
               Expanded(
                 child: DeltaBox(
-                  label: 'AVG',
+                  label: 'AVG LAP',
                   deltaMs: avgDelta,
                   hasData: hasAvgData,
+                  targetMs: targetLapMs,
                 ),
               ),
-              Container(width: 1, color: sep),
+              const SizedBox(width: 5),
               Expanded(
                 child: TyreTile(
                   label: 'FL',
@@ -71,7 +73,7 @@ class SmartphoneDashboard extends StatelessWidget {
                   viewMode: config.viewMode,
                 ),
               ),
-              Container(width: 1, color: sep),
+              const SizedBox(width: 5),
               Expanded(
                 child: TyreTile(
                   label: 'FR',
@@ -85,7 +87,7 @@ class SmartphoneDashboard extends StatelessWidget {
             ],
           ),
         ),
-        Container(height: 1, color: sep),
+        const SizedBox(height: 5),
         // Row 2: NEXT STOP | TOT STOPS | RL | RR
         Expanded(
           child: Row(
@@ -101,14 +103,14 @@ class SmartphoneDashboard extends StatelessWidget {
                   targetRaceTimeMs: config.targetRaceTime.inMilliseconds.toDouble(),
                 ),
               ),
-              Container(width: 1, color: sep),
+              const SizedBox(width: 5),
               Expanded(
                 child: RemainingStopsBox(
                   stops: remainingStops,
                   hasData: hasData,
                 ),
               ),
-              Container(width: 1, color: sep),
+              const SizedBox(width: 5),
               Expanded(
                 child: TyreTile(
                   label: 'RL',
@@ -119,7 +121,7 @@ class SmartphoneDashboard extends StatelessWidget {
                   viewMode: config.viewMode,
                 ),
               ),
-              Container(width: 1, color: sep),
+              const SizedBox(width: 5),
               Expanded(
                 child: TyreTile(
                   label: 'RR',

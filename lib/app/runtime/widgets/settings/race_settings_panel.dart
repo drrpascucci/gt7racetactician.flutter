@@ -116,6 +116,7 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
           const SizedBox(height: Gt7Spacing.md),
           DropdownButtonFormField<RaceType>(
             value: _raceType,
+            dropdownColor: Colors.black,
             decoration: const InputDecoration(
               labelText: 'Race type',
               border: OutlineInputBorder(

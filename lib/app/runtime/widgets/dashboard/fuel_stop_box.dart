@@ -46,28 +46,36 @@ class FuelStopBox extends StatelessWidget {
     final lapText = !hasData || stopLap <= 0
         ? '???'
         : isBeyondEnd
-        ? 'NO STOP'
+        ? 'STAY OUT'
         : 'L $stopLap';
     return Container(
-      color: const Color(0xFF1A1A1A),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: const Color(0xFF545454), width: 1),
+      ),
+      child: Stack(
         children: [
-          Text(
-            lapText,
-            style: const TextStyle(
-              color: Gt7Colors.lapsForeColor,
-              fontSize: UiConstants.compactBigFontSize,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'RobotoMono',
+          Positioned(
+            top: 4,
+            left: 6,
+            child: const Text(
+              'NEXT STOP',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 14.4,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-          const Text(
-            'NEXT STOP',
-            style: TextStyle(
-              color: Gt7Colors.lapsForeColor,
-              fontSize: UiConstants.smallFontSize, // 9 * 3
-              fontWeight: FontWeight.bold,
+          Center(
+            child: Text(
+              lapText,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: UiConstants.compactBigFontSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

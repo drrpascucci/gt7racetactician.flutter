@@ -30,7 +30,7 @@ class TyreSection extends StatelessWidget {
                   viewMode: config.viewMode,
                 ),
               ),
-              Container(width: 1, color: const Color(0xFF333333)),
+              const SizedBox(width: 5),
               Expanded(
                 child: TyreTile(
                   label: 'FR',
@@ -44,7 +44,7 @@ class TyreSection extends StatelessWidget {
             ],
           ),
         ),
-        Container(height: 1, color: const Color(0xFF333333)),
+        const SizedBox(height: 5),
         Expanded(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -59,7 +59,7 @@ class TyreSection extends StatelessWidget {
                   viewMode: config.viewMode,
                 ),
               ),
-              Container(width: 1, color: const Color(0xFF333333)),
+              const SizedBox(width: 5),
               Expanded(
                 child: TyreTile(
                   label: 'RR',

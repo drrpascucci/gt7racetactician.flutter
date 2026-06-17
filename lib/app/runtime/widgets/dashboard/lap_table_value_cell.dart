@@ -10,8 +10,6 @@ class LapTableValueCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gt7 = context.gt7Theme;
-
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: compact ? Gt7Spacing.xs : Gt7Spacing.sm,
@@ -21,9 +19,11 @@ class LapTableValueCell extends StatelessWidget {
         value,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: Gt7Typography.tableCell(
-          color ?? gt7.telemetry,
-        ).copyWith(fontSize: compact ? 12 : 13),
+        style: TextStyle(
+          color: color ?? Colors.white,
+          fontSize: compact ? 18 : 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

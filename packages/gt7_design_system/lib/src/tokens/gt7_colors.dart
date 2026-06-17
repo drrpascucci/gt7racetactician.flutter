@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 final class Gt7Colors {
   const Gt7Colors._();
 
-  static const background = Color(0xFF2A2A2A);
-  static const panel = Color(0xFF1A1A1A);
-  static const panelAlt = Color(0xFF252525);
-  static const headerSurface = Color(0xFF0A0A0A);
-  static const border = Colors.white;
+  static const background = Color(0xFF000000);
+  static const panel = Color(0xFF000000);
+  static const panelAlt = Color(0xFF0A0A0A);
+  static const headerSurface = Color(0xFF000000);
+  static const border = Color(0xFF333333);
 
   static const telemetry = Color(0xFFFFFFFF);
-  static const description = Color(0xFFCCCCCC);
+  static const description = Color(0xFFBBBBBB);
   static const textMuted = Color(0xFF888888);
 
   static const highlight = Color(0xFF00FF00);

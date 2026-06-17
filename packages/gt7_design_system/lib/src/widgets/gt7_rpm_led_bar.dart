@@ -58,7 +58,7 @@ class Gt7RpmLedBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gt7 = context.gt7Theme;
-    final ledHeight = compact ? 18.0 : 24.0;
+    final ledHeight = compact ? 21.6 : 28.8;
     final blink = shouldBlink(rpm: rpm, limit: limit, blinkAboveRpm: blinkAboveRpm);
     final activeLeds = blink
         ? totalLeds
@@ -75,19 +75,19 @@ class Gt7RpmLedBar extends StatelessWidget {
                 child: Container(
                   key: ValueKey('gt7-led-$index'),
                   height: ledHeight,
+                  constraints: BoxConstraints(maxWidth: ledHeight),
                   margin: EdgeInsets.only(
                     right: index == totalLeds - 1 ? 0 : Gt7Spacing.xxs,
                   ),
-                  decoration: ShapeDecoration(
+                  decoration: BoxDecoration(
                     color: _ledColor(
                       index: index,
                       gt7: gt7,
                       activeLeds: activeLeds,
                       blink: blink,
                     ),
-                    shape: StadiumBorder(
-                      side: BorderSide(color: gt7.ledOutline),
-                    ),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: gt7.ledOutline),
                   ),
                 ),
               ),
