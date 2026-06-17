@@ -26,7 +26,7 @@ subprojects {
     afterEvaluate {
         if (project.hasProperty("android")) {
             project.extensions.configure<com.android.build.gradle.BaseExtension>("android") {
-                ndkVersion = "25.2.9519653"
+                ndkVersion = "29.0.14206865"
             }
         }
     }
@@ -34,4 +34,5 @@ subprojects {
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
+    delete(File(rootProject.projectDir.parentFile, "build"))
 }

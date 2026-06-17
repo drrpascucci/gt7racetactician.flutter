@@ -49,15 +49,16 @@ val localAppData =
     System.getenv("LOCALAPPDATA")
         ?: File(System.getProperty("user.home"), "AppData\\Local").absolutePath
 val externalBuildRoot = File(localAppData, "gt7racetactician_flutter_build")
-val flutterExpectedOutputDir =
-    File(rootProject.projectDir.parentFile, "build\\app\\outputs\\flutter-apk")
+val flutterExpectedOutputsDir =
+    File(rootProject.projectDir.parentFile, "build/app/outputs")
 
-val copyDebugFlutterApk by tasks.registering(Copy::class) {
-    dependsOn("assembleDebug")
-    from(File(externalBuildRoot, "app\\outputs\\flutter-apk\\app-debug.apk"))
-    into(flutterExpectedOutputDir)
+val copyFlutterOutputs by tasks.registering(Copy::class) {
+    from(File(externalBuildRoot, "app/outputs"))
+    into(flutterExpectedOutputsDir)
 }
 
-tasks.matching { it.name == "assembleDebug" }.configureEach {
-    finalizedBy(copyDebugFlutterApk)
+tasks.configureEach {
+    if (name.startsWith("assemble") || name.startsWith("bundle")) {
+        finalizedBy(copyFlutterOutputs)
+    }
 }
