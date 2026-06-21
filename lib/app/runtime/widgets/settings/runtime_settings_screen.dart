@@ -36,7 +36,7 @@ class _RuntimeSettingsScreenState extends State<RuntimeSettingsScreen> {
             backgroundColor: Colors.black,
             surfaceTintColor: Colors.transparent,
             title: const Text(
-              'GT7 Race Tactician Settings',
+              'Settings',
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             iconTheme: const IconThemeData(color: Colors.white),
@@ -52,16 +52,6 @@ class _RuntimeSettingsScreenState extends State<RuntimeSettingsScreen> {
               child: ListView(
               padding: Gt7Spacing.screenInsets,
               children: [
-                Text(
-                  'GT7 RACE TACTICIAN SETTINGS',
-                  style: TextStyle(
-                    color: context.gt7Theme.highlight,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'RobotoMono',
-                    letterSpacing: 1.2,
-                  ),
-                ),
                 const SizedBox(height: Gt7Spacing.lg),
                 RaceSettingsPanel(
                   key: _raceSettingsKey,
@@ -97,8 +87,9 @@ class _RuntimeSettingsScreenState extends State<RuntimeSettingsScreen> {
               ],
             ),
           ),
-        );
-      },
+        ),
+      );
+    },
     );
   }
 }

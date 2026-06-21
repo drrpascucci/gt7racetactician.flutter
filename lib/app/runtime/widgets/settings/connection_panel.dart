@@ -123,13 +123,6 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             decoration: const InputDecoration(
               labelText: 'Manual PlayStation IP',
               hintText: '192.168.0.10',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-                borderSide: BorderSide(color: Colors.white24),
-              ),
             ),
           ),
           const SizedBox(height: Gt7Spacing.sm),

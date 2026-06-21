@@ -132,14 +132,14 @@ final class Gt7AppTheme {
         filled: true,
         fillColor: Colors.black,
         hintStyle: textTheme.bodyMedium?.copyWith(color: gt7Theme.textMuted),
-        labelStyle: textTheme.labelLarge?.copyWith(color: gt7Theme.description),
+        labelStyle: textTheme.labelLarge?.copyWith(color: Colors.white),
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(4)),
-          borderSide: BorderSide(color: Color(0xFF333333)),
+          borderSide: BorderSide(color: Colors.white38),
         ),
         enabledBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(4)),
-          borderSide: BorderSide(color: Color(0xFF333333)),
+          borderSide: BorderSide(color: Colors.white),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(4)),

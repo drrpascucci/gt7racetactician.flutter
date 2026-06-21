@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:gt7_domain/src/race_enums.dart';
+import 'package:gt7_domain/src/race_event.dart';
 import 'package:gt7_domain/src/race_lap.dart';
 import 'package:gt7_domain/src/race_stint.dart';
 
@@ -15,9 +17,16 @@ class Race {
     reset();
   }
 
+  final _eventController = StreamController<RaceEvent>.broadcast();
+  Stream<RaceEvent> get events => _eventController.stream;
+
   final List<RaceLap> laps = <RaceLap>[];
 
   int lastRefuelLap = 1;
+  int _lastEventLap = -1;
+  int _lastEventPosition = -1;
+  double _lastEventFuel = -1;
+  bool _raceStartedFired = false;
   double avgConsumptionPerLap = 0;
   double currentFuelLevel = 100;
   double pitLaneTimeMs;
@@ -129,11 +138,22 @@ class Race {
 
     for (final existingLap in laps) {
       if (existingLap.lapNumber == lap.lapNumber) {
+        final oldPosition = existingLap.position;
         existingLap.lapTimeMs = lap.lapTimeMs;
         existingLap.fuel = lap.fuel;
         existingLap.position = lap.position;
+
+        if (oldPosition != 0 && oldPosition != lap.position) {
+          _eventController.add(PositionChangedEvent(oldPosition, lap.position));
+          _lastEventPosition = lap.position;
+        }
         return;
       }
+    }
+
+    if (!_raceStartedFired && lap.lapNumber == 1) {
+      _eventController.add(RaceStartedEvent(lap.position, lap.fuel));
+      _raceStartedFired = true;
     }
 
     final lastLap = laps.isNotEmpty ? laps.last : null;
@@ -159,6 +179,29 @@ class Race {
     }
 
     laps.add(lap);
+
+    if (lap.lapNumber > _lastEventLap) {
+      _eventController.add(NewLapStartedEvent(lap.lapNumber, previousLap: lastLap));
+      _lastEventLap = lap.lapNumber;
+    }
+
+    if (lap.position != 0 && lap.position != _lastEventPosition) {
+      if (_lastEventPosition != -1) {
+        _eventController.add(PositionChangedEvent(_lastEventPosition, lap.position));
+      }
+      _lastEventPosition = lap.position;
+    }
+
+    if (avgConsumptionPerLap > 0) {
+      final remainingLaps = lap.fuel / avgConsumptionPerLap;
+      if (remainingLaps <= 2.0 &&
+          (lap.lapNumber > _lastEventLap ||
+              _lastEventFuel == -1 ||
+              (lap.fuel < _lastEventFuel - 1))) {
+        _eventController.add(LowFuelEvent(lap.fuel, remainingLaps));
+        _lastEventFuel = lap.fuel;
+      }
+    }
   }
 
   double elapsedTimeMs([int lapNumber = -1]) {
@@ -239,11 +282,19 @@ class Race {
   void reset() {
     laps.clear();
     lastRefuelLap = 1;
+    _lastEventLap = -1;
+    _lastEventPosition = -1;
+    _lastEventFuel = -1;
+    _raceStartedFired = false;
     avgConsumptionPerLap = 0;
     tankCapacity = 100;
     predictedRefuelQty = -1;
     currentRefuelQty = 100;
     lastLapConsumption = 0;
+  }
+
+  void dispose() {
+    _eventController.close();
   }
 
   double _timeToLapMs(int lapNumber) {

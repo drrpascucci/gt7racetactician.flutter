@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "634671637588",
+    "project_id": "gt7-race-tactician",
+    "storage_bucket": "gt7-race-tactician.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634671637588:android:4d96cf5fa2f2ca923779c1",
+        "android_client_info": {
+          "package_name": "it.pasqc.gt7racetactician_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWdDUajrQ0SP3jZywDZIQJ_GZA9WPk8EY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

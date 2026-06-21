@@ -10,8 +10,8 @@ final class Gt7Colors {
   static const border = Color(0xFF333333);
 
   static const telemetry = Color(0xFFFFFFFF);
-  static const description = Color(0xFFBBBBBB);
-  static const textMuted = Color(0xFF888888);
+  static const description = Color(0xFFDDDDDD);
+  static const textMuted = Color(0xFFB0B0B0);
 
   static const highlight = Color(0xFF00FF00);
   static const warning = Color(0xFFFFFF00);

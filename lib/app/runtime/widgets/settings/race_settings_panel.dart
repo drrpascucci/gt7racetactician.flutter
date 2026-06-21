@@ -108,9 +108,6 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
             textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
               labelText: 'Track name',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
             ),
           ),
           const SizedBox(height: Gt7Spacing.md),
@@ -119,9 +116,6 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
             dropdownColor: Colors.black,
             decoration: const InputDecoration(
               labelText: 'Race type',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
             ),
             items: RaceType.values
                 .where((value) => value != RaceType.undefined)
@@ -150,9 +144,6 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Target laps',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(4)),
-                    ),
                   ),
                 ),
               ),
@@ -165,9 +156,6 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
                     labelText: _raceType == RaceType.timeRace
                         ? 'Total minutes'
                         : 'Target minutes',
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(4)),
-                    ),
                   ),
                 ),
               ),
@@ -182,9 +170,6 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Pit lane seconds',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(4)),
-                    ),
                   ),
                 ),
               ),

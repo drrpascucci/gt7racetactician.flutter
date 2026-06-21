@@ -55,7 +55,7 @@ class Gt7Theme extends ThemeExtension<Gt7Theme> {
     headerSurface: Color(0xFF111111),
     border: Color(0xFFBBBBBB),
     telemetry: Color(0xFF111111),
-    description: Color(0xFF535353),
+    description: Color(0xFFBBBBBB),
     textMuted: Color(0xFF757575),
     highlight: Gt7Colors.highlight,
     computed: Gt7Colors.computed,

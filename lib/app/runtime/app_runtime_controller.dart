@@ -111,6 +111,12 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
          RaceViewState.initial(configService.config),
        ) {
     _telemetryGateway = _primaryTelemetryGateway;
+    _race = Race(
+      configService.config.raceType,
+      configService.config.targetLaps,
+      configService.config.targetRaceTime.inMilliseconds.toDouble(),
+      pitLaneTimeMs: configService.config.pitLaneTime.inMilliseconds.toDouble(),
+    );
   }
 
   final AppConfigService configService;
@@ -125,6 +131,9 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
 
   final ValueNotifier<TelemetryViewState> telemetryState;
   final ValueNotifier<RaceViewState> raceState;
+
+  late final Race _race;
+  Stream<RaceEvent> get raceEvents => _race.events;
 
   RuntimeConnectionState _connectionState = RuntimeConnectionState.idle();
   RuntimeConnectionState get connectionState => _connectionState;
@@ -289,6 +298,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
     _latestPacket = packet;
     _latestPacketAt = DateTime.now();
     _packetsReceived += 1;
+    _updateRaceModel(packet);
     _syncLapHistory(packet);
     _syncTireTemperatureExtremes(packet.tireTemperatures);
 
@@ -334,38 +344,56 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
     _emitTelemetryStateImmediately(errorMessage: '$error');
   }
 
+  void _updateRaceModel(Gt7TelemetryPacket packet) {
+    final config = configService.config;
+    _race.raceType = config.raceType;
+    _race.raceLaps = packet.totalLaps > 0 ? packet.totalLaps : config.targetLaps;
+    _race.raceTimeMs = config.targetRaceTime.inMilliseconds.toDouble();
+    _race.pitLaneTimeMs = config.pitLaneTime.inMilliseconds.toDouble();
+    _race.trackName = config.trackName;
+    _race.tankCapacity = packet.fuelCapacity > 0 ? packet.fuelCapacity : 100;
+    _race.currentFuelLevel = packet.fuelLevel;
+  }
+
   void _syncLapHistory(Gt7TelemetryPacket packet) {
     final lapNumber = packet.currentLap < 1 ? 1 : packet.currentLap;
 
     if (_lapHistory.isEmpty) {
-      _lapHistory[0] = RaceLap(
+      final lap0 = RaceLap(
         lapNumber: 0,
         fuel: packet.fuelCapacity > 0 ? packet.fuelCapacity : packet.fuelLevel,
         position: packet.racePosition,
         complete: true,
       );
+      _lapHistory[0] = lap0;
+      _race.addOrUpdateLap(lap0);
     }
 
     if (_currentLapNumber != null && lapNumber < _currentLapNumber!) {
       _lapHistory.clear();
+      _race.reset();
       _currentLapNumber = null;
-      _lapHistory[0] = RaceLap(
+      final lap0 = RaceLap(
         lapNumber: 0,
         fuel: packet.fuelCapacity > 0 ? packet.fuelCapacity : packet.fuelLevel,
         position: packet.racePosition,
         complete: true,
       );
+      _lapHistory[0] = lap0;
+      _race.addOrUpdateLap(lap0);
     }
 
     if (_currentLapNumber != null && lapNumber > _currentLapNumber!) {
       final completedLapNumber = lapNumber - 1;
-      _lapHistory[completedLapNumber] = RaceLap(
+      final completedLap = RaceLap(
         lapNumber: completedLapNumber,
         fuel: packet.fuelLevel,
         lapTimeMs: packet.lastLapTimeMs.toDouble(),
         position: packet.racePosition,
         complete: true,
       );
+      _lapHistory[completedLapNumber] = completedLap;
+      _race.addOrUpdateLap(completedLap);
     }
 
     _currentLapNumber = lapNumber;
@@ -378,6 +406,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       ..lapTimeMs = packet.lastLapTimeMs.toDouble()
       ..position = packet.racePosition
       ..complete = false;
+    _race.addOrUpdateLap(currentLap);
   }
 
   Future<void> discoverPlaystation() async {
@@ -913,33 +942,10 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Race _buildRaceSnapshot() {
-    final config = configService.config;
-    final race = Race(
-      config.raceType,
-      config.targetLaps,
-      config.targetRaceTime.inMilliseconds.toDouble(),
-      pitLaneTimeMs: config.pitLaneTime.inMilliseconds.toDouble(),
-    );
-
-    race.targetLaps = _latestPacket?.totalLaps?? config.targetLaps;
-    race.trackName = config.trackName;
-    race.tankCapacity = _latestPacket?.fuelCapacity ?? 100;
-    race.currentFuelLevel = _latestPacket?.fuelLevel ?? 0;
-
-    for (final lap in _lapHistory.values) {
-      race.addOrUpdateLap(
-        RaceLap(
-          lapNumber: lap.lapNumber,
-          fuel: lap.fuel,
-          lapTimeMs: lap.lapTimeMs,
-          position: lap.position,
-          complete: lap.complete,
-          targetTimeMs: lap.targetTimeMs,
-        ),
-      );
+    if (_latestPacket != null) {
+      _updateRaceModel(_latestPacket!);
     }
-
-    return race;
+    return _race;
   }
 
   void _emitTelemetryState({String? errorMessage}) {
@@ -1100,6 +1106,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
     }
     telemetryState.dispose();
     raceState.dispose();
+    _race.dispose();
     super.dispose();
   }
 }
