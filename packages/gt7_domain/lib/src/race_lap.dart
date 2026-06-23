@@ -6,12 +6,14 @@ class RaceLap implements Comparable<RaceLap> {
     this.position = 0,
     this.complete = false,
     this.targetTimeMs = 0,
+    this.distanceMeters = 0,
   });
 
   final int lapNumber;
   double fuel;
   double lapTimeMs;
   double targetTimeMs;
+  double distanceMeters;
   int position;
   bool complete;
 
@@ -28,6 +30,7 @@ class RaceLap implements Comparable<RaceLap> {
     targetTimeMs = other.targetTimeMs;
     position = other.position;
     complete = other.complete;
+    distanceMeters = other.distanceMeters;
   }
 
   @override
@@ -50,6 +53,7 @@ class RaceLap implements Comparable<RaceLap> {
         'lapTime=$lapTimeMs,'
         'target=$targetTimeMs,'
         'fuel=$fuel,'
+        'distance=$distanceMeters,'
         'position=$position,'
         'complete=$complete'
         ')';

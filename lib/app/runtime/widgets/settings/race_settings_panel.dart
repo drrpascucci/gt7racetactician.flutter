@@ -49,41 +49,45 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
   void didUpdateWidget(covariant RaceSettingsPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     final config = widget.initialConfig;
-    if (_trackController.text != config.trackName) {
-      _trackController.text = config.trackName;
-    }
-    if (_lapsController.text != '${config.targetLaps}') {
-      _lapsController.text = '${config.targetLaps}';
-    }
-    if (_minutesController.text != '${config.targetRaceTime.inMinutes}') {
-      _minutesController.text = '${config.targetRaceTime.inMinutes}';
-    }
-    if (_pitLaneController.text != '${config.pitLaneTime.inSeconds}') {
-      _pitLaneController.text = '${config.pitLaneTime.inSeconds}';
-    }
-    // Only resync slider when persisted value actually changed (not during drag)
-    if (config.shiftPercentage.toDouble().clamp(75.0, 100.0) != _shiftPercentage &&
-        config.shiftPercentage.toDouble() !=
-            oldWidget.initialConfig.shiftPercentage) {
-      _shiftPercentage = config.shiftPercentage.toDouble().clamp(75.0, 100.0);
-    }
-    if (_raceType != config.raceType) {
-      _raceType = config.raceType;
-    }
-    // Only resync sliders when persisted value actually changed (not during drag)
-    if (config.tyreColdMax.toDouble().clamp(40.0, 150.0) != _tyreColdMax &&
-        config.tyreColdMax.toDouble() != oldWidget.initialConfig.tyreColdMax) {
-      _tyreColdMax = config.tyreColdMax.toDouble().clamp(40.0, 150.0);
-    }
-    if (config.tyreOptimalMax.toDouble().clamp(40.0, 150.0) != _tyreOptimalMax &&
-        config.tyreOptimalMax.toDouble() !=
-            oldWidget.initialConfig.tyreOptimalMax) {
-      _tyreOptimalMax = config.tyreOptimalMax.toDouble().clamp(40.0, 150.0);
-    }
-    if (config.tyreHotMax.toDouble().clamp(40.0, 150.0) != _tyreHotMax &&
-        config.tyreHotMax.toDouble() != oldWidget.initialConfig.tyreHotMax) {
-      _tyreHotMax = config.tyreHotMax.toDouble().clamp(40.0, 150.0);
-    }
+    setState(() {
+      if (_trackController.text != config.trackName) {
+        _trackController.text = config.trackName;
+      }
+      if (_lapsController.text != '${config.targetLaps}') {
+        _lapsController.text = '${config.targetLaps}';
+      }
+      if (_minutesController.text != '${config.targetRaceTime.inMinutes}') {
+        _minutesController.text = '${config.targetRaceTime.inMinutes}';
+      }
+      if (_pitLaneController.text != '${config.pitLaneTime.inSeconds}') {
+        _pitLaneController.text = '${config.pitLaneTime.inSeconds}';
+      }
+      // Only resync slider when persisted value actually changed (not during drag)
+      if (config.shiftPercentage.toDouble().clamp(75.0, 100.0) !=
+              _shiftPercentage &&
+          config.shiftPercentage.toDouble() !=
+              oldWidget.initialConfig.shiftPercentage) {
+        _shiftPercentage = config.shiftPercentage.toDouble().clamp(75.0, 100.0);
+      }
+      if (_raceType != config.raceType) {
+        _raceType = config.raceType;
+      }
+      // Only resync sliders when persisted value actually changed (not during drag)
+      if (config.tyreColdMax.toDouble().clamp(40.0, 150.0) != _tyreColdMax &&
+          config.tyreColdMax.toDouble() != oldWidget.initialConfig.tyreColdMax) {
+        _tyreColdMax = config.tyreColdMax.toDouble().clamp(40.0, 150.0);
+      }
+      if (config.tyreOptimalMax.toDouble().clamp(40.0, 150.0) !=
+              _tyreOptimalMax &&
+          config.tyreOptimalMax.toDouble() !=
+              oldWidget.initialConfig.tyreOptimalMax) {
+        _tyreOptimalMax = config.tyreOptimalMax.toDouble().clamp(40.0, 150.0);
+      }
+      if (config.tyreHotMax.toDouble().clamp(40.0, 150.0) != _tyreHotMax &&
+          config.tyreHotMax.toDouble() != oldWidget.initialConfig.tyreHotMax) {
+        _tyreHotMax = config.tyreHotMax.toDouble().clamp(40.0, 150.0);
+      }
+    });
   }
 
   @override

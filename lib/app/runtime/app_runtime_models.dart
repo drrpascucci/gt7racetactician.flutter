@@ -136,6 +136,9 @@ class RaceViewState {
     required this.distanceFromTargetMs,
     required this.targetAvgLapTimeMs,
     required this.lastUpdatedAt,
+    this.elapsedTime = Duration.zero,
+    this.lapDistanceMeters = 0,
+    this.trackLength = 0,
     this.currentLap,
     this.lastCompletedLap,
   });
@@ -154,13 +157,17 @@ class RaceViewState {
       estimatedTotalTimeMs: 0,
       distanceFromTargetMs: 0,
       targetAvgLapTimeMs: 0,
+      lapDistanceMeters: 0,
+      trackLength: 0,
       lastUpdatedAt: DateTime.now(),
+      elapsedTime: Duration.zero,
     );
   }
 
   factory RaceViewState.fromRace({
     required AppConfig config,
     required Race race,
+    Duration elapsedTime = Duration.zero,
   }) {
     final laps = List<RaceLap>.unmodifiable(
       race.laps.map(
@@ -171,6 +178,7 @@ class RaceViewState {
           position: lap.position,
           complete: lap.complete,
           targetTimeMs: lap.targetTimeMs,
+          distanceMeters: lap.distanceMeters,
         ),
       ),
     );
@@ -217,7 +225,10 @@ class RaceViewState {
       estimatedTotalTimeMs: estimatedTotalTimeMs,
       distanceFromTargetMs: distanceFromTargetMs,
       targetAvgLapTimeMs: targetAvgLapTimeMs,
+      lapDistanceMeters: race.laps.isNotEmpty ? race.laps.last.distanceMeters : 0,
+      trackLength: race.trackLength,
       lastUpdatedAt: DateTime.now(),
+      elapsedTime: elapsedTime,
     );
   }
 
@@ -236,5 +247,20 @@ class RaceViewState {
   final double estimatedFuelToEnd;
   final double estimatedTotalTimeMs;
   final double distanceFromTargetMs;
+  final double lapDistanceMeters;
+  final double trackLength;
   final DateTime lastUpdatedAt;
+  final Duration elapsedTime;
+
+  Duration get remainingTime {
+    final remaining = config.targetRaceTime - elapsedTime;
+    return remaining.isNegative ? Duration.zero : remaining;
+  }
+
+  int get remainingLaps {
+    if (config.targetLaps <= 0) return 0;
+    if (currentLapNumber <= 0) return config.targetLaps;
+    final remaining = config.targetLaps - currentLapNumber + 1;
+    return remaining < 0 ? 0 : remaining;
+  }
 }

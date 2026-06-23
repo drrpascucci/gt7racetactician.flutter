@@ -14,6 +14,7 @@ class FuelStopBox extends StatelessWidget {
     required this.targetLaps,
     required this.predictedStints,
     required this.targetRaceTimeMs,
+    required this.currentLap,
   });
 
   final int stopLap;
@@ -22,6 +23,7 @@ class FuelStopBox extends StatelessWidget {
   final int targetLaps;
   final List<RaceStint> predictedStints;
   final double targetRaceTimeMs;
+  final int currentLap;
 
   bool _isStopBeyondRaceEnd() {
     if (!hasData || stopLap <= 0) {
@@ -43,6 +45,7 @@ class FuelStopBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isBeyondEnd = _isStopBeyondRaceEnd();
+    final isPitLap = hasData && stopLap > 0 && currentLap == stopLap;
     final lapText = !hasData || stopLap <= 0
         ? '???'
         : isBeyondEnd
@@ -50,31 +53,40 @@ class FuelStopBox extends StatelessWidget {
         : 'L $stopLap';
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: isPitLap ? Colors.orange : const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(5),
-        border: Border.all(color: const Color(0xFF545454), width: 1),
+        border: Border.all(
+          color: isPitLap ? Colors.orangeAccent : const Color(0xFF545454),
+          width: 1,
+        ),
       ),
       child: Stack(
         children: [
           Positioned(
             top: 4,
             left: 6,
-            child: const Text(
+            child: Text(
               'NEXT STOP',
               style: TextStyle(
-                color: Colors.white70,
+                color: isPitLap ? Colors.black87 : Colors.white70,
                 fontSize: 14.4,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
           Center(
-            child: Text(
-              lapText,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: UiConstants.compactBigFontSize,
-                fontWeight: FontWeight.bold,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  lapText,
+                  style: TextStyle(
+                    color: isPitLap ? Colors.black : Colors.white,
+                    fontSize: UiConstants.compactBigFontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ),

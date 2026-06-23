@@ -28,6 +28,7 @@ class Race {
   double _lastEventFuel = -1;
   bool _raceStartedFired = false;
   double avgConsumptionPerLap = 0;
+  double trackLength = 0;
   double currentFuelLevel = 100;
   double pitLaneTimeMs;
   double predictedRefuelQty = 100;
@@ -61,7 +62,37 @@ class Race {
     return (raceTimeMs - pitStopAdjustmentMs) / raceLaps;
   }
 
-  double get averageConsumptionPerLap => avgConsumptionPerLap;
+  double get averageConsumptionPerLap => effectiveConsumptionPerLap;
+
+  double get liveConsumptionPerLap {
+    if (laps.isEmpty || trackLength <= 0) return avgConsumptionPerLap;
+
+    final currentLap = laps.last;
+    if (currentLap.distanceMeters <= 100) return avgConsumptionPerLap;
+
+    double startFuel = tankCapacity;
+    final prevLap = _lapForNumber(currentLap.lapNumber - 1);
+    if (prevLap != null) {
+      startFuel = prevLap.fuel;
+    }
+
+    final fuelUsed = startFuel - currentLap.fuel;
+    if (fuelUsed <= 0) return avgConsumptionPerLap;
+
+    return (fuelUsed / currentLap.distanceMeters) * trackLength;
+  }
+
+  double get effectiveConsumptionPerLap {
+    final live = liveConsumptionPerLap;
+    if (live > 0 && live < tankCapacity) {
+      // Blend live with historical for stability if we have historical data
+      if (avgConsumptionPerLap > 0) {
+        return (avgConsumptionPerLap * 0.7) + (live * 0.3);
+      }
+      return live;
+    }
+    return avgConsumptionPerLap;
+  }
 
   List<RaceStint> computeStintPredictions() {
     final stints = <RaceStint>[];
@@ -142,6 +173,7 @@ class Race {
         existingLap.lapTimeMs = lap.lapTimeMs;
         existingLap.fuel = lap.fuel;
         existingLap.position = lap.position;
+        existingLap.distanceMeters = lap.distanceMeters;
 
         if (oldPosition != 0 && oldPosition != lap.position) {
           _eventController.add(PositionChangedEvent(oldPosition, lap.position));
@@ -176,6 +208,10 @@ class Race {
           }
         }
       }
+    }
+
+    if (lap.complete && lap.lapNumber > 0 && trackLength == 0) {
+      trackLength = lap.distanceMeters;
     }
 
     laps.add(lap);
@@ -287,6 +323,7 @@ class Race {
     _lastEventFuel = -1;
     _raceStartedFired = false;
     avgConsumptionPerLap = 0;
+    trackLength = 0;
     tankCapacity = 100;
     predictedRefuelQty = -1;
     currentRefuelQty = 100;

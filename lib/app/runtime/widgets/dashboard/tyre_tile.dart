@@ -14,6 +14,7 @@ class TyreTile extends StatelessWidget {
     required this.optimalMax,
     required this.hotMax,
     required this.viewMode,
+    this.fontSize,
   });
 
   final String label;
@@ -22,6 +23,7 @@ class TyreTile extends StatelessWidget {
   final int optimalMax;
   final int hotMax;
   final DashboardViewMode viewMode;
+  final double? fontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +59,7 @@ class TyreTile extends StatelessWidget {
               label,
               style: TextStyle(
                 color: labelColor,
-                fontSize: UiConstants.smallFontSize,
+                fontSize: 12, // Reduced from smallFontSize for tighter grid
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -67,7 +69,7 @@ class TyreTile extends StatelessWidget {
               temperatureLabel(temp),
               style: TextStyle(
                 color: contentColor,
-                fontSize: UiConstants.getBigFontSize(viewMode),
+                fontSize: fontSize ?? UiConstants.getBigFontSize(viewMode),
                 fontWeight: FontWeight.bold,
               ),
             ),

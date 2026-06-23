@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:gt7_design_system/gt7_design_system.dart';
 
 import '../../ui_constants.dart';
 
-class RemainingStopsBox extends StatelessWidget {
-  const RemainingStopsBox({super.key, required this.stops, required this.hasData});
+class CurrentLapBox extends StatelessWidget {
+  const CurrentLapBox({super.key, required this.currentLap});
 
-  final int stops;
-  final bool hasData;
+  final int currentLap;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +21,7 @@ class RemainingStopsBox extends StatelessWidget {
             top: 4,
             left: 6,
             child: const Text(
-              'STOPS REMAINING',
+              'CURRENT LAP',
               style: TextStyle(
                 color: Colors.white70,
                 fontSize: 14.4,
@@ -37,7 +35,7 @@ class RemainingStopsBox extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  hasData ? '$stops' : '00',
+                  currentLap > 0 ? '$currentLap' : '1',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: UiConstants.compactBigFontSize,

@@ -170,7 +170,7 @@ class AppConfig {
 
   static int _readInt(Object? value, int fallback, {required int minimum}) {
     final parsed = switch (value) {
-      int intValue => intValue,
+      num numValue => numValue.toInt(),
       String stringValue => int.tryParse(stringValue) ?? fallback,
       _ => fallback,
     };

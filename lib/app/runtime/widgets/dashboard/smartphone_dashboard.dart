@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../app_runtime_models.dart';
 import '../../../config/app_config.dart';
+import 'current_lap_box.dart';
 import 'delta_box.dart';
+import 'fuel_level_box.dart';
 import 'fuel_stop_box.dart';
 import 'remaining_stops_box.dart';
-import 'tyre_tile.dart';
+import 'tyre_grid.dart';
 
 class SmartphoneDashboard extends StatelessWidget {
   const SmartphoneDashboard({
@@ -35,64 +37,18 @@ class SmartphoneDashboard extends StatelessWidget {
     final remainingStops = (predictedStints.length - 1).clamp(0, 999);
     final hasData = predictedStints.isNotEmpty;
 
-    const sep = Colors.black;
-
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Row 1: LAST LAP | AVG LAP | FL | FR
         Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Column(
             children: [
               Expanded(
-                child: DeltaBox(
-                  label: 'LAST LAP',
-                  deltaMs: lastLapDelta,
-                  hasData: hasLastLap,
-                  targetMs: targetLapMs,
+                child: CurrentLapBox(
+                  currentLap: race.currentLapNumber,
                 ),
               ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: DeltaBox(
-                  label: 'AVG LAP',
-                  deltaMs: avgDelta,
-                  hasData: hasAvgData,
-                  targetMs: targetLapMs,
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: TyreTile(
-                  label: 'FL',
-                  temp: temps.isEmpty ? 80 : temps.frontLeft,
-                  coldMax: config.tyreColdMax,
-                  optimalMax: config.tyreOptimalMax,
-                  hotMax: config.tyreHotMax,
-                  viewMode: config.viewMode,
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: TyreTile(
-                  label: 'FR',
-                  temp: temps.isEmpty ? 80 : temps.frontRight,
-                  coldMax: config.tyreColdMax,
-                  optimalMax: config.tyreOptimalMax,
-                  hotMax: config.tyreHotMax,
-                  viewMode: config.viewMode,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 5),
-        // Row 2: NEXT STOP | TOT STOPS | RL | RR
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+              const SizedBox(height: 5),
               Expanded(
                 child: FuelStopBox(
                   stopLap: stopLap,
@@ -101,38 +57,52 @@ class SmartphoneDashboard extends StatelessWidget {
                   targetLaps: config.targetLaps,
                   predictedStints: predictedStints,
                   targetRaceTimeMs: config.targetRaceTime.inMilliseconds.toDouble(),
+                  currentLap: race.currentLapNumber,
                 ),
               ),
-              const SizedBox(width: 5),
+              const SizedBox(height: 5),
+              Expanded(
+                child: DeltaBox(
+                  label: 'LAST LAP',
+                  deltaMs: lastLapDelta,
+                  hasData: hasLastLap,
+                  targetMs: targetLapMs,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 5),
+        Expanded(
+          child: Column(
+            children: [
+              Expanded(
+                child: FuelLevelBox(fuelLevel: telemetry.fuelLevel),
+              ),
+              const SizedBox(height: 5),
               Expanded(
                 child: RemainingStopsBox(
                   stops: remainingStops,
                   hasData: hasData,
                 ),
               ),
-              const SizedBox(width: 5),
+              const SizedBox(height: 5),
               Expanded(
-                child: TyreTile(
-                  label: 'RL',
-                  temp: temps.isEmpty ? 80 : temps.rearLeft,
-                  coldMax: config.tyreColdMax,
-                  optimalMax: config.tyreOptimalMax,
-                  hotMax: config.tyreHotMax,
-                  viewMode: config.viewMode,
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: TyreTile(
-                  label: 'RR',
-                  temp: temps.isEmpty ? 80 : temps.rearRight,
-                  coldMax: config.tyreColdMax,
-                  optimalMax: config.tyreOptimalMax,
-                  hotMax: config.tyreHotMax,
-                  viewMode: config.viewMode,
+                child: DeltaBox(
+                  label: 'AVG LAP',
+                  deltaMs: avgDelta,
+                  hasData: hasAvgData,
+                  targetMs: targetLapMs,
                 ),
               ),
             ],
+          ),
+        ),
+        const SizedBox(width: 5),
+        Expanded(
+          child: TyreGrid(
+            tireTemperatures: temps,
+            config: config,
           ),
         ),
       ],

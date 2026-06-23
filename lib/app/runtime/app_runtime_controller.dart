@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
@@ -151,6 +152,11 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
   InternetAddress? _playstationAddress;
   int _packetsReceived = 0;
   int? _currentLapNumber;
+  int? _lastPacketId;
+  Gt7Vector3? _lastPosition;
+  DateTime? _sessionStartTime;
+  double _totalDistanceMeters = 0;
+  double _lapDistanceMeters = 0;
   int _connectionGeneration = 0;
   bool _telemetryRequested = false;
   bool _usingManualAddress = false;
@@ -200,6 +206,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
     if (_disposed) {
       return;
     }
+    _syncRaceWithConfig();
     configService.addListener(_handleConfigChanged);
     _slowStateTimer = Timer.periodic(
       slowRefreshInterval,
@@ -234,6 +241,11 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> resetSession() async {
     _lapHistory.clear();
     _currentLapNumber = null;
+    _totalDistanceMeters = 0;
+    _lapDistanceMeters = 0;
+    _lastPacketId = null;
+    _lastPosition = null;
+    _sessionStartTime = null;
     _minimumTireTemperatures = _zeroWheelValues;
     _maximumTireTemperatures = _zeroWheelValues;
     _emitTelemetryStateImmediately();
@@ -249,6 +261,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
 
+    _syncRaceWithConfig();
     _emitRaceState();
     _emitTelemetryStateImmediately();
     unawaited(_syncRawLogging());
@@ -298,6 +311,14 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
     _latestPacket = packet;
     _latestPacketAt = DateTime.now();
     _packetsReceived += 1;
+
+    if (_sessionStartTime == null && packet.currentLap > 0) {
+      _sessionStartTime = DateTime.now().subtract(
+        Duration(milliseconds: _race.elapsedTimeMs().toInt()),
+      );
+    }
+
+    _updateDistance(packet);
     _updateRaceModel(packet);
     _syncLapHistory(packet);
     _syncTireTemperatureExtremes(packet.tireTemperatures);
@@ -344,6 +365,22 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
     _emitTelemetryStateImmediately(errorMessage: '$error');
   }
 
+  void _updateDistance(Gt7TelemetryPacket packet) {
+    if (_lastPacketId != null && _lastPosition != null) {
+      final dx = packet.position.x - _lastPosition!.x;
+      final dy = packet.position.y - _lastPosition!.y;
+      final dz = packet.position.z - _lastPosition!.z;
+      final delta = sqrt(dx * dx + dy * dy + dz * dz);
+
+      if (delta < 500) {
+        _totalDistanceMeters += delta;
+        _lapDistanceMeters += delta;
+      }
+    }
+    _lastPacketId = packet.packetId;
+    _lastPosition = packet.position;
+  }
+
   void _updateRaceModel(Gt7TelemetryPacket packet) {
     final config = configService.config;
     _race.raceType = config.raceType;
@@ -373,6 +410,8 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       _lapHistory.clear();
       _race.reset();
       _currentLapNumber = null;
+      _totalDistanceMeters = 0;
+      _lapDistanceMeters = 0;
       final lap0 = RaceLap(
         lapNumber: 0,
         fuel: packet.fuelCapacity > 0 ? packet.fuelCapacity : packet.fuelLevel,
@@ -390,10 +429,12 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
         fuel: packet.fuelLevel,
         lapTimeMs: packet.lastLapTimeMs.toDouble(),
         position: packet.racePosition,
+        distanceMeters: _lapDistanceMeters,
         complete: true,
       );
       _lapHistory[completedLapNumber] = completedLap;
       _race.addOrUpdateLap(completedLap);
+      _lapDistanceMeters = 0;
     }
 
     _currentLapNumber = lapNumber;
@@ -405,6 +446,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       ..fuel = packet.fuelLevel
       ..lapTimeMs = packet.lastLapTimeMs.toDouble()
       ..position = packet.racePosition
+      ..distanceMeters = _lapDistanceMeters
       ..complete = false;
     _race.addOrUpdateLap(currentLap);
   }
@@ -1002,15 +1044,29 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void _emitRaceState() {
+    final elapsed = _sessionStartTime == null
+        ? Duration.zero
+        : DateTime.now().difference(_sessionStartTime!);
+
     raceState.value = RaceViewState.fromRace(
       config: configService.config,
       race: _buildRaceSnapshot(),
+      elapsedTime: elapsed,
     );
   }
 
   void _setConnectionState(RuntimeConnectionState state) {
     _connectionState = state;
     notifyListeners();
+  }
+
+  void _syncRaceWithConfig() {
+    final config = configService.config;
+    _race.raceType = config.raceType;
+    _race.raceLaps = config.targetLaps;
+    _race.raceTimeMs = config.targetRaceTime.inMilliseconds.toDouble();
+    _race.pitLaneTimeMs = config.pitLaneTime.inMilliseconds.toDouble();
+    _race.trackName = config.trackName;
   }
 
   void _syncTireTemperatureExtremes(Gt7WheelValues values) {
