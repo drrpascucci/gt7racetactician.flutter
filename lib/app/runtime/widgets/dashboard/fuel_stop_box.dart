@@ -48,6 +48,8 @@ class FuelStopBox extends StatelessWidget {
     final isPitLap = hasData && stopLap > 0 && currentLap == stopLap;
     final lapText = !hasData || stopLap <= 0
         ? '???'
+        : isPitLap
+        ? 'BOX'
         : isBeyondEnd
         ? 'STAY OUT'
         : 'L $stopLap';
