@@ -35,12 +35,13 @@ class DashboardTopBar extends StatelessWidget {
           SizedBox(
             width: 80,
             child: Text(
-              'GT7 Race Tactician',
+              'GT7 Tactician',
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Color(0xFFE60000),
-                fontSize: 8,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 height: 1.2,
               ),
@@ -50,34 +51,18 @@ class DashboardTopBar extends StatelessWidget {
           // RPM display: value text + thin progress bar
           SizedBox(
             width: 120,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${rpm.toStringAsFixed(0)} RPM',
-                  style: const TextStyle(
-                    color: Color(0xFF00E676),
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                SizedBox(
-                  height: 4,
-                  child: LinearProgressIndicator(
-                    value: rpmFraction,
-                    backgroundColor: const Color(0xFF222222),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Color(0xFF00E676),
-                    ),
-                    borderRadius: BorderRadius.zero,
-                  ),
-                ),
-              ],
+            child: Text(
+              rpm.toStringAsFixed(0),
+              textAlign: TextAlign.right,
+              style: const TextStyle(
+                color: Color(0xFF00E676),
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+
+              ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 20),
           // Gear LED bar — fills remaining space
           Expanded(
             child: Gt7RpmLedBar(

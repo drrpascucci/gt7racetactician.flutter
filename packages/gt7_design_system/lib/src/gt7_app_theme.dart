@@ -75,7 +75,7 @@ final class Gt7AppTheme {
       useMaterial3: true,
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
-      fontFamily: 'Roboto Mono',
+      fontFamily: 'Rubik',
       textTheme: textTheme,
       scaffoldBackgroundColor: gt7Theme.background,
       canvasColor: gt7Theme.background,

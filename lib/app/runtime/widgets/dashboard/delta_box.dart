@@ -19,24 +19,24 @@ class DeltaBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color bg;
-    final Color fg = Colors.white;
+    final Color qualitativeColor;
+    final bg = const Color(0xFF1A1A1A); // Always dark gray background
     final Color labelColor = Colors.white70;
     final IconData icon;
 
     if (!hasData || targetMs <= 0) {
-      bg = const Color(0xFF1A1A1A);
+      qualitativeColor = const Color(0xFF545454);
       icon = Icons.pending;
     } else {
       final threshold = targetMs * 0.005; // 0.5%
       if (deltaMs < -threshold) {
-        bg = const Color(0xFF43A047); // Green - Faster
+        qualitativeColor = const Color(0xFF43A047); // Green - Faster
         icon = Icons.arrow_downward;
       } else if (deltaMs > threshold) {
-        bg = const Color(0xFFE53935); // Red - Slower
+        qualitativeColor = const Color(0xFFE53935); // Red - Slower
         icon = Icons.arrow_upward;
       } else {
-        bg = const Color(0xFF1E88E5); // Blue - Similar
+        qualitativeColor = const Color(0xFF1E88E5); // Blue - Similar
         icon = Icons.check;
       }
     }
@@ -45,7 +45,7 @@ class DeltaBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(5),
-        border: Border.all(color: const Color(0xFF545454), width: 1),
+        border: Border.all(color: qualitativeColor, width: 3), // Thicker border
       ),
       child: Stack(
         children: [
@@ -59,11 +59,12 @@ class DeltaBox extends StatelessWidget {
                 fontSize: 14.4,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
+                fontFamily: 'Rubik',
               ),
             ),
           ),
           Center(
-            child: Column(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
@@ -71,13 +72,14 @@ class DeltaBox extends StatelessWidget {
                       ? formatAdaptiveSignedDurationMs(deltaMs, compact: true)
                       : '0.000',
                   style: TextStyle(
-                    color: fg,
+                    color: qualitativeColor, // Text color matches border
                     fontSize: UiConstants.compactBigFontSize,
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'JetBrains Mono',
                   ),
                 ),
-                const SizedBox(height: 2),
-                Icon(icon, color: fg, size: 27),
+                const SizedBox(width: 10),
+                Icon(icon, color: qualitativeColor, size: 27),
               ],
             ),
           ),

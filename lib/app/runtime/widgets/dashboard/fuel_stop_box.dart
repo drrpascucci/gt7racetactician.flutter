@@ -47,12 +47,14 @@ class FuelStopBox extends StatelessWidget {
     final isBeyondEnd = _isStopBeyondRaceEnd();
     final isPitLap = hasData && stopLap > 0 && currentLap == stopLap;
     final lapText = !hasData || stopLap <= 0
-        ? '???'
+        ? 'UPDATING'
         : isPitLap
         ? 'BOX'
         : isBeyondEnd
         ? 'STAY OUT'
         : 'L $stopLap';
+    final double fontSize = hasData ? UiConstants.compactBigFontSize : UiConstants.smallFontSize;
+
     return Container(
       decoration: BoxDecoration(
         color: isPitLap ? Colors.orange : const Color(0xFF1A1A1A),
@@ -73,6 +75,7 @@ class FuelStopBox extends StatelessWidget {
                 color: isPitLap ? Colors.black87 : Colors.white70,
                 fontSize: 14.4,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'Rubik',
               ),
             ),
           ),
@@ -85,8 +88,9 @@ class FuelStopBox extends StatelessWidget {
                   lapText,
                   style: TextStyle(
                     color: isPitLap ? Colors.black : Colors.white,
-                    fontSize: UiConstants.compactBigFontSize,
+                    fontSize: fontSize,
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'JetBrains Mono',
                   ),
                 ),
               ),

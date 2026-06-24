@@ -11,6 +11,7 @@ class RemainingStopsBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double fontSize = hasData ? UiConstants.compactBigFontSize : UiConstants.smallFontSize;
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A1A),
@@ -28,6 +29,7 @@ class RemainingStopsBox extends StatelessWidget {
                 color: Colors.white70,
                 fontSize: 14.4,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'Rubik',
               ),
             ),
           ),
@@ -37,11 +39,12 @@ class RemainingStopsBox extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  hasData ? '$stops' : '00',
-                  style: const TextStyle(
+                  hasData ? '$stops' : 'UPDATING',
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: UiConstants.compactBigFontSize,
+                    fontSize: fontSize,
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'JetBrains Mono',
                   ),
                 ),
               ),

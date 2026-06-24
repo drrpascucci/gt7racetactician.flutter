@@ -7,7 +7,7 @@ import 'delta_box.dart';
 import 'fuel_level_box.dart';
 import 'fuel_stop_box.dart';
 import 'remaining_stops_box.dart';
-import 'tyre_grid.dart';
+import 'tyre_grid_smartphone.dart';
 
 class SmartphoneDashboard extends StatelessWidget {
   const SmartphoneDashboard({
@@ -100,8 +100,9 @@ class SmartphoneDashboard extends StatelessWidget {
         ),
         const SizedBox(width: 5),
         Expanded(
-          child: TyreGrid(
-            tireTemperatures: temps,
+          flex: 1,
+          child: TyreGridSmartphone(
+            tyreTemps: temps,
             config: config,
           ),
         ),

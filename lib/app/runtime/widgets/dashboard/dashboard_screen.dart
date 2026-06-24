@@ -17,7 +17,7 @@ import 'remaining_race_box.dart';
 import 'remaining_stops_box.dart';
 import 'smartphone_dashboard.dart';
 import 'strategy_section.dart';
-import 'tyre_section.dart';
+import 'tyre_grid_tablet.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({
@@ -250,8 +250,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                           const SizedBox(width: 5), // Spacing between left column and tyres
                           Expanded(
-                            flex: 40,
-                            child: TyreSection(
+                            flex: 20,
+                            child: TyreGridTablet(
                               telemetry: widget.telemetry,
                               config: widget.config,
                             ),

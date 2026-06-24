@@ -3,8 +3,14 @@ import 'package:flutter/material.dart';
 final class Gt7Typography {
   const Gt7Typography._();
 
-  static const _sansFallback = <String>['Roboto Mono', 'Roboto', 'Arial'];
+  static const _sansFallback = <String>[
+    'Rubik',
+    'Roboto Mono',
+    'Roboto',
+    'Arial',
+  ];
   static const _monoFallback = <String>[
+    'JetBrains Mono',
     'Roboto Mono',
     'Consolas',
     'Courier New',

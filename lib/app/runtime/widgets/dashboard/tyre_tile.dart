@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gt7_design_system/gt7_design_system.dart';
 
 import '../../app_runtime_models.dart';
 import '../../../config/app_config.dart';
@@ -44,37 +45,20 @@ class TyreTile extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: tone,
+        color: Gt7Colors.panel,
         borderRadius: BorderRadius.circular(5),
-        border: Border.all(color: const Color(0xFF545454), width: 1),
+        border: Border.all(color: tone, width: 8),
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: isTopCorner ? 4 : null,
-            bottom: isTopCorner ? null : 4,
-            left: isLeftCorner ? 6 : null,
-            right: isLeftCorner ? null : 6,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: labelColor,
-                fontSize: 12, // Reduced from smallFontSize for tighter grid
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+      child: Center(
+        child: Text(
+          temperatureLabel(temp),
+          style: TextStyle(
+            color: contentColor,
+            fontSize: UiConstants.getBigFontSize(viewMode),
+            fontWeight: FontWeight.bold,
+            fontFamily: 'JetBrains Mono',
           ),
-          Center(
-            child: Text(
-              temperatureLabel(temp),
-              style: TextStyle(
-                color: contentColor,
-                fontSize: fontSize ?? UiConstants.getBigFontSize(viewMode),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

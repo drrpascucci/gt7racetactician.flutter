@@ -78,7 +78,7 @@ Map<int, double> raceDeltaByLap(RaceViewState race) {
 
 String temperatureLabel(double value) {
   if (value <= 0) {
-    return '??';
+    return '80.0';
   }
   return '${value.toStringAsFixed(1)}°';
 }
