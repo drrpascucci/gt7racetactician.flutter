@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gt7_design_system/gt7_design_system.dart' show Gt7Colors;
 
 import '../../ui_constants.dart';
 import '../runtime_ui_utils.dart';
@@ -21,7 +22,7 @@ class DeltaBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color qualitativeColor;
     final bg = const Color(0xFF1A1A1A); // Always dark gray background
-    final Color labelColor = Colors.white70;
+    final Color labelColor = Gt7Colors.boxLabel;
     final IconData icon;
 
     if (!hasData || targetMs <= 0) {

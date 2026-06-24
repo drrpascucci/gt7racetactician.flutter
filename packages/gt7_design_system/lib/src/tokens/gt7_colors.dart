@@ -11,6 +11,7 @@ final class Gt7Colors {
 
   static const telemetry = Color(0xFFFFFFFF);
   static const description = Color(0xFFDDDDDD);
+  static const boxLabel = Color(0xFFAFAFAF);
   static const textMuted = Color(0xFFB0B0B0);
 
   static const highlight = Color(0xFF00FF00);

@@ -26,7 +26,7 @@ class RemainingStopsBox extends StatelessWidget {
             child: const Text(
               'STOPS REMAINING',
               style: TextStyle(
-                color: Colors.white70,
+                color: Gt7Colors.boxLabel,
                 fontSize: 14.4,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Rubik',

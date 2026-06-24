@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gt7_design_system/gt7_design_system.dart';
 
 import '../../ui_constants.dart';
 
@@ -23,7 +24,7 @@ class FuelLevelBox extends StatelessWidget {
             child: const Text(
               'FUEL LEVEL',
               style: TextStyle(
-                color: Colors.white70,
+                color: Gt7Colors.boxLabel,
                 fontSize: 14.4,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Rubik',

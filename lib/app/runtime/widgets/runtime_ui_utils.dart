@@ -80,7 +80,7 @@ String temperatureLabel(double value) {
   if (value <= 0) {
     return '80.0';
   }
-  return '${value.toStringAsFixed(1)}°';
+  return '${value.toStringAsFixed(1)}';
 }
 
 String relativeTimestamp(DateTime? value) {

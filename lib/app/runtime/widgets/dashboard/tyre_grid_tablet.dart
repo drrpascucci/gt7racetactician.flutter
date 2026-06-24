@@ -82,17 +82,7 @@ class TyreGridTablet extends StatelessWidget {
             ),
           ],
         ),
-        Container(
-          height: 120,
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.0),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Image.asset(
-            'assets/images/gt_car.png',
-            fit: BoxFit.contain,
-          ),
-        ),
+
       ],
     );
   }

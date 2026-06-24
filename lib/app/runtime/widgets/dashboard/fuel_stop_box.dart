@@ -72,7 +72,7 @@ class FuelStopBox extends StatelessWidget {
             child: Text(
               'NEXT STOP',
               style: TextStyle(
-                color: isPitLap ? Colors.black87 : Colors.white70,
+                color: Gt7Colors.boxLabel,
                 fontSize: 14.4,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Rubik',
