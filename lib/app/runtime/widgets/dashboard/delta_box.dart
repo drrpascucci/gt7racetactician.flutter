@@ -48,6 +48,7 @@ class DeltaBox extends StatelessWidget {
         borderRadius: BorderRadius.circular(5),
         border: Border.all(color: qualitativeColor, width: 3), // Thicker border
       ),
+
       child: Stack(
         children: [
           Positioned(

@@ -89,7 +89,7 @@ class SmartphoneDashboard extends StatelessWidget {
               const SizedBox(height: 5),
               Expanded(
                 child: DeltaBox(
-                  label: 'AVG LAP',
+                  label: 'AVERAGE LAP',
                   deltaMs: avgDelta,
                   hasData: hasAvgData,
                   targetMs: targetLapMs,
