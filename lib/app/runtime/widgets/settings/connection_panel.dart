@@ -44,7 +44,8 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
   void didUpdateWidget(covariant ConnectionPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     final nextValue = widget.config.normalizedManualPlaystationIp ?? '';
-    if (_manualIpController.text != nextValue) {
+    final prevValue = oldWidget.config.normalizedManualPlaystationIp ?? '';
+    if (nextValue != prevValue) {
       _manualIpController.text = nextValue;
     }
   }

@@ -49,43 +49,66 @@ class _RuntimeSettingsScreenState extends State<RuntimeSettingsScreen> {
                       displayColor: Colors.white,
                     ),
               ),
-              child: ListView(
-              padding: Gt7Spacing.screenInsets,
-              children: [
-                const SizedBox(height: Gt7Spacing.lg),
-                RaceSettingsPanel(
-                  key: _raceSettingsKey,
-                  initialConfig: config,
-                  onSave: widget.controller.updateConfig,
-                ),
-                const SizedBox(height: Gt7Spacing.lg),
-                ConnectionPanel(
-                  controller: widget.controller,
-                  config: config,
-                  telemetry: widget.controller.telemetryState.value,
-                  connection: widget.controller.connectionState,
-                ),
-                const SizedBox(height: Gt7Spacing.lg),
-                DebugTelemetryPanel(controller: widget.controller, config: config),
-                const SizedBox(height: Gt7Spacing.xl),
-                Align(
-                  alignment: Alignment.center,
-                  child: AppButton(
-                    label: 'Apply & Close',
-                    onPressed: () async {
-                      await _raceSettingsKey.currentState?.save();
-                      if (mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    backgroundColor: const Color(0xFF388E3C),
-                    foregroundColor: Colors.white,
-                    borderColor: Gt7Colors.border,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: Gt7Spacing.screenInsets,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: Gt7Spacing.lg),
+                          RaceSettingsPanel(
+                            key: _raceSettingsKey,
+                            initialConfig: config,
+                            onSave: widget.controller.updateConfig,
+                          ),
+                          const SizedBox(height: Gt7Spacing.lg),
+                          ConnectionPanel(
+                            controller: widget.controller,
+                            config: config,
+                            telemetry: widget.controller.telemetryState.value,
+                            connection: widget.controller.connectionState,
+                          ),
+                          const SizedBox(height: Gt7Spacing.lg),
+                          DebugTelemetryPanel(
+                            controller: widget.controller,
+                            config: config,
+                          ),
+
+
+
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: Gt7Spacing.xl * 2),
-              ],
-            ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Gt7Colors.panelAlt,
+                      border: Border.all(color: Gt7Colors.border, width: 1),
+                      borderRadius: BorderRadius.circular(10),
+                    ) ,
+                    padding: const EdgeInsets.all(Gt7Spacing.md),
+                    margin: EdgeInsets.fromLTRB(15, 5, 15, 5),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: AppButton(
+                        label: 'Apply & Close',
+                        onPressed: () async {
+
+                          await _raceSettingsKey.currentState?.save();
+                          if (mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        backgroundColor: const Color(0xFF388E3C),
+                        foregroundColor: Colors.white,
+                        borderColor: Gt7Colors.border,
+                      ),
+
+                    ),
+                  ),
+                ],
+              ),
           ),
         ),
       );

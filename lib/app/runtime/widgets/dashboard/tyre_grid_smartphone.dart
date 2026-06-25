@@ -37,7 +37,7 @@ class TyreGridSmartphone extends StatelessWidget {
                 child: Text(
                   "TYRE TEMPS °",
                   style: TextStyle(
-                    color: Gt7Colors.description,
+                    color: Gt7Colors.boxLabel,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'JetBrains Mono',

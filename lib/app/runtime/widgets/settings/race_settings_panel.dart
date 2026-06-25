@@ -49,42 +49,36 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
   void didUpdateWidget(covariant RaceSettingsPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     final config = widget.initialConfig;
+    final oldConfig = oldWidget.initialConfig;
     setState(() {
-      if (_trackController.text != config.trackName) {
+      if (config.trackName != oldConfig.trackName) {
         _trackController.text = config.trackName;
       }
-      if (_lapsController.text != '${config.targetLaps}') {
+      if (config.targetLaps != oldConfig.targetLaps) {
         _lapsController.text = '${config.targetLaps}';
       }
-      if (_minutesController.text != '${config.targetRaceTime.inMinutes}') {
+      if (config.targetRaceTime.inMinutes !=
+          oldConfig.targetRaceTime.inMinutes) {
         _minutesController.text = '${config.targetRaceTime.inMinutes}';
       }
-      if (_pitLaneController.text != '${config.pitLaneTime.inSeconds}') {
+      if (config.pitLaneTime.inSeconds != oldConfig.pitLaneTime.inSeconds) {
         _pitLaneController.text = '${config.pitLaneTime.inSeconds}';
       }
       // Only resync slider when persisted value actually changed (not during drag)
-      if (config.shiftPercentage.toDouble().clamp(75.0, 100.0) !=
-              _shiftPercentage &&
-          config.shiftPercentage.toDouble() !=
-              oldWidget.initialConfig.shiftPercentage) {
+      if (config.shiftPercentage != oldConfig.shiftPercentage) {
         _shiftPercentage = config.shiftPercentage.toDouble().clamp(75.0, 100.0);
       }
-      if (_raceType != config.raceType) {
+      if (config.raceType != oldConfig.raceType) {
         _raceType = config.raceType;
       }
       // Only resync sliders when persisted value actually changed (not during drag)
-      if (config.tyreColdMax.toDouble().clamp(40.0, 150.0) != _tyreColdMax &&
-          config.tyreColdMax.toDouble() != oldWidget.initialConfig.tyreColdMax) {
+      if (config.tyreColdMax != oldConfig.tyreColdMax) {
         _tyreColdMax = config.tyreColdMax.toDouble().clamp(40.0, 150.0);
       }
-      if (config.tyreOptimalMax.toDouble().clamp(40.0, 150.0) !=
-              _tyreOptimalMax &&
-          config.tyreOptimalMax.toDouble() !=
-              oldWidget.initialConfig.tyreOptimalMax) {
+      if (config.tyreOptimalMax != oldConfig.tyreOptimalMax) {
         _tyreOptimalMax = config.tyreOptimalMax.toDouble().clamp(40.0, 150.0);
       }
-      if (config.tyreHotMax.toDouble().clamp(40.0, 150.0) != _tyreHotMax &&
-          config.tyreHotMax.toDouble() != oldWidget.initialConfig.tyreHotMax) {
+      if (config.tyreHotMax != oldConfig.tyreHotMax) {
         _tyreHotMax = config.tyreHotMax.toDouble().clamp(40.0, 150.0);
       }
     });
@@ -146,8 +140,10 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
                 child: TextField(
                   controller: _lapsController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Target laps',
+                  decoration:  InputDecoration(
+                    labelText: _raceType == RaceType.timeRace
+                        ? 'Target minutes'
+                        : 'Total laps',
                   ),
                 ),
               ),
@@ -306,6 +302,7 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
   }
 
   Future<void> save() async {
+
     final original = widget.initialConfig;
     await widget.onSave(
       original.copyWith(
@@ -338,6 +335,8 @@ class RaceSettingsPanelState extends State<RaceSettingsPanel> {
         tyreHotMax: _tyreHotMax.round(),
       ),
     );
+
+
     if (!mounted) {
       return;
     }
