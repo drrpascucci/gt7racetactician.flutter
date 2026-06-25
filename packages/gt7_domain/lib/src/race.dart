@@ -125,10 +125,11 @@ class Race {
     var stintStart = max(lastRefuelLap, 1);
     var stintEnd = currentLapNumber + lapsWithCurrentFuel;
 
-    while (stintStart < raceLaps) {
+    while (stintStart <= raceLaps) {
       final startTimeMs = _timeToLapMs(stintStart);
+      final averageLapTime = avgLapTimeMs();
       final endTimeMs =
-          startTimeMs + (stintEnd - stintStart + 1) * avgLapTimeMs();
+          startTimeMs + (stintEnd - stintStart + 1) * averageLapTime;
 
       stints.add(
         RaceStint(
@@ -145,18 +146,28 @@ class Race {
       );
 
       stintStart = stintEnd + 1;
+      if (stintStart > raceLaps) {
+        break;
+      }
+
       if (raceType == RaceType.lapRace) {
         remainingLaps = raceLaps - stintEnd;
       } else {
-        final remainingTimeMs = raceTimeMs - (stintEnd * avgLapTimeMs());
-        final averageLapTime = avgLapTimeMs();
+        final remainingTimeMs = raceTimeMs - (stintEnd * averageLapTime);
         if (averageLapTime > 0) {
           remainingLaps = (remainingTimeMs / averageLapTime).ceil();
         } else {
           remainingLaps = 0;
         }
       }
-      stintEnd = stintStart + min<int>(lapsWithFullTank, remainingLaps) - 1;
+      
+      final lapsInStint = max(1, min<int>(lapsWithFullTank, remainingLaps));
+      stintEnd = stintStart + lapsInStint - 1;
+
+      // Safety break to prevent infinite loops if logic fails to advance
+      if (stints.length > 500) {
+        break;
+      }
     }
 
     return stints;
