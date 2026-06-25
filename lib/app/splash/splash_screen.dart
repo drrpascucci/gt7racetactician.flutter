@@ -28,13 +28,23 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF0A0A0A),
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0A0A),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            Container(
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(120) ,
+                  color: Colors.white),
+              child: SizedBox(
+                width: 120,
+                height: 120,
+                child: Image.asset('assets/images/gt7_tactician_icon.png'),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
               'GT7 RACE TACTICIAN',
               style: TextStyle(
                 color: Colors.white,
@@ -43,13 +53,13 @@ class _SplashScreenState extends State<SplashScreen> {
                 letterSpacing: 4,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 8),
+            const Text(
               'Telemetry Monitor',
               style: TextStyle(color: Color(0xFF888888), fontSize: 14),
             ),
-            SizedBox(height: 32),
-            CircularProgressIndicator(color: Color(0xFFE63946)),
+            const SizedBox(height: 32),
+            const CircularProgressIndicator(color: Color(0xFFE63946)),
           ],
         ),
       ),

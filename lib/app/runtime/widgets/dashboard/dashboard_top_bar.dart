@@ -32,19 +32,13 @@ class DashboardTopBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Logo area
-          SizedBox(
-            width: 80,
-            child: Text(
-              'GT7 Tactician',
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Color(0xFFE60000),
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                height: 1.2,
-              ),
+          Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(22) ,
+                color: Colors.white),
+            child: SizedBox(
+              width: 44,
+              height: 44,
+              child: Image.asset('assets/images/gt7_tactician_icon.png'),
             ),
           ),
           const SizedBox(width: 6),
