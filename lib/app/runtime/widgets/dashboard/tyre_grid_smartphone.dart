@@ -80,7 +80,7 @@ class TyreGridSmartphone extends StatelessWidget {
                     Expanded(
                       child: TyreTile(
                         label: 'RL',
-                        temp: tyreTemps.isEmpty ? 80 : tyreTemps.rearLeft,
+                        temp: tyreTemps.isEmpty ? 100.0 : tyreTemps.rearLeft,
                         coldMax: config.tyreColdMax,
                         optimalMax: config.tyreOptimalMax,
                         hotMax: config.tyreHotMax,
@@ -92,7 +92,7 @@ class TyreGridSmartphone extends StatelessWidget {
                     Expanded(
                       child: TyreTile(
                         label: 'RR',
-                        temp: tyreTemps.isEmpty ? 80 : tyreTemps.rearRight,
+                        temp: tyreTemps.isEmpty ? 140.1 : tyreTemps.rearRight,
                         coldMax: config.tyreColdMax,
                         optimalMax: config.tyreOptimalMax,
                         hotMax: config.tyreHotMax,

@@ -42,7 +42,7 @@ class TyreTile extends StatelessWidget {
     final isBright = tone.computeLuminance() > 0.5;
     final contentColor = isBright ? Colors.black : Colors.white;
     final labelColor = isBright ? Colors.black54 : Colors.white70;
-
+    final fontSize = temp < 100 ? UiConstants.getBigFontSize(viewMode) : UiConstants.getBigFontSize(viewMode) * 0.8;
     return Container(
       decoration: BoxDecoration(
         color: Gt7Colors.panel,
@@ -54,7 +54,7 @@ class TyreTile extends StatelessWidget {
           temperatureLabel(temp),
           style: TextStyle(
             color: contentColor,
-            fontSize: UiConstants.getBigFontSize(viewMode),
+            fontSize: fontSize,
             fontWeight: FontWeight.bold,
             fontFamily: 'JetBrains Mono',
           ),
