@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gt7_design_system/gt7_design_system.dart';
 
 import '../../app_runtime_controller.dart';
 import '../../app_runtime_models.dart';
@@ -31,19 +32,19 @@ class DashboardToolbar extends StatelessWidget {
     final isBusy = connection.isBusy;
 
     final simBtnBg = isLive
-        ? const Color(0xFFCC0000)
+        ? const Color(0xFF333333)
         : phase == RuntimeConnectionPhase.connecting
         ? const Color(0xFFCC8800)
         : phase == RuntimeConnectionPhase.error
         ? const Color(0xFFCC4400)
-        : const Color(0xFF333333);
+        : Gt7Colors.ok;
     final simBtnLabel = isLive
-        ? '■ STOP'
+        ? 'STOP'
         : phase == RuntimeConnectionPhase.connecting
-        ? '⏳ CONNECTING'
+        ? 'CONNECTING'
         : phase == RuntimeConnectionPhase.error
-        ? '⚠ RETRY'
-        : '▶ START';
+        ? 'RETRY'
+        : 'START';
     final simBtnBorder = isLive
         ? const Color(0xFFFF4444)
         : phase == RuntimeConnectionPhase.connecting
@@ -62,7 +63,8 @@ class DashboardToolbar extends StatelessWidget {
           Tooltip(
             message: 'Open settings',
             child: AppButton(
-              label: '⚙ SETTINGS',
+              label: 'SETTINGS',
+              foregroundColor: Colors.white,
               onPressed: () => openSettingsScreen(context, controller),
             ),
           ),

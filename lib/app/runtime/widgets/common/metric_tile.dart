@@ -16,9 +16,8 @@ class MetricTile extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 120),
       padding: const EdgeInsets.all(Gt7Spacing.md),
       decoration: BoxDecoration(
-        color: gt7.panelAlt,
-        borderRadius: BorderRadius.circular(Gt7Spacing.radiusMedium),
-        border: Border.all(color: gt7.border),
+        border: Border.all(color: Gt7Colors.border, width: 2),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -26,18 +25,12 @@ class MetricTile extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(
-              context,
-            ).textTheme.labelMedium?.copyWith(color: gt7.description),
           ),
           const SizedBox(height: Gt7Spacing.xs),
           Text(
             value,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(color: tone ?? gt7.telemetry),
           ),
         ],
       ),

@@ -92,7 +92,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
             runSpacing: Gt7Spacing.md,
             children: [
               MetricTile(
-                label: 'Endpoint',
+                label: 'ENDPOINT',
                 value:
                     address ??
                     (widget.connection.usingManualAddress
@@ -100,7 +100,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                         : 'Broadcast discovery'),
               ),
               MetricTile(
-                label: 'Source',
+                label: 'SOURCE',
                 value: widget.connection.usingManualAddress
                     ? 'Manual IP'
                     : 'Discovery',
@@ -109,7 +109,7 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
                     : gt7.highlight,
               ),
               MetricTile(
-                label: 'Last packet',
+                label: 'LAST PACKET',
                 value: relativeTimestamp(widget.telemetry.lastPacketAt),
               ),
             ],
@@ -146,10 +146,6 @@ class _ConnectionPanelState extends State<ConnectionPanel> {
               AppButton(
                 label: 'Reconnect',
                 onPressed: widget.controller.reconnect,
-              ),
-              AppButton(
-                label: 'Change PlayStation',
-                onPressed: _changePlaystation,
               ),
             ],
           ),

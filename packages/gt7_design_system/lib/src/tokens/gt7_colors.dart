@@ -7,7 +7,7 @@ final class Gt7Colors {
   static const panel = Color(0xFF000000);
   static const panelAlt = Color(0xFF0A0A0A);
   static const headerSurface = Color(0xFF000000);
-  static const border = Color(0xFF333333);
+  static const border = Color(0xFF555555);
 
   static const telemetry = Color(0xFFFFFFFF);
   static const description = Color(0xFFDDDDDD);
@@ -37,4 +37,7 @@ final class Gt7Colors {
   static const Color hotTempColor = Color(0xFFE4A308);
   static const Color overheatedTempColor = Color(0xFFE53935);
   static const Color undefinedTempColor = Color(0xFF44444A);
+
+  static const Color cancel = Color(0xFF333333);
+  static const Color ok = Color(0xFF388E3C);
 }

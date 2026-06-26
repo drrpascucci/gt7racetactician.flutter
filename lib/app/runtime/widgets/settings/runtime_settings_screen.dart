@@ -82,27 +82,43 @@ class _RuntimeSettingsScreenState extends State<RuntimeSettingsScreen> {
                     ),
                   ),
                   Container(
-                    decoration: BoxDecoration(
-                      color: Gt7Colors.panelAlt,
-                      border: Border.all(color: Gt7Colors.border, width: 1),
-                      borderRadius: BorderRadius.circular(10),
-                    ) ,
-                    padding: const EdgeInsets.all(Gt7Spacing.md),
+                    color: const Color(0xFF1E1E1E),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+
                     margin: EdgeInsets.fromLTRB(15, 5, 15, 5),
                     child: Align(
                       alignment: Alignment.center,
-                      child: AppButton(
-                        label: 'Apply & Close',
-                        onPressed: () async {
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          AppButton(
+                            label: 'CANCEL',
+                            onPressed: () {
+                              if (mounted) {
+                                Navigator.of(context).pop();
+                              }
+                            },
+                            backgroundColor: Gt7Colors.cancel,
+                            foregroundColor: Colors.white,
+                            borderColor: Gt7Colors.border,
+                          ),
+                          const SizedBox(width: 10),
+                          AppButton(
 
-                          await _raceSettingsKey.currentState?.save();
-                          if (mounted) {
-                            Navigator.of(context).pop();
-                          }
-                        },
-                        backgroundColor: const Color(0xFF388E3C),
-                        foregroundColor: Colors.white,
-                        borderColor: Gt7Colors.border,
+                            label: 'APPLY',
+                            onPressed: () async {
+
+                              await _raceSettingsKey.currentState?.save();
+                              if (mounted) {
+                                Navigator.of(context).pop();
+                              }
+                            },
+                            backgroundColor: Gt7Colors.ok,
+                            foregroundColor: Colors.white,
+                            borderColor: Gt7Colors.border,
+                          ),
+                        ],
                       ),
 
                     ),

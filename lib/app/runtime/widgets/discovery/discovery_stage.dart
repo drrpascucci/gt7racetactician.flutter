@@ -118,8 +118,8 @@ class _DiscoveryStageState extends State<DiscoveryStage> {
           const SizedBox(height: Gt7Spacing.lg),
           AppButton(
             label: widget.connection.phase == RuntimeConnectionPhase.discovering
-                ? 'Searching...'
-                : 'Search PS',
+                ? 'SEARCHING...'
+                : 'SEARCH PS',
             onPressed: widget.connection.isBusy
                 ? null
                 : widget.controller.discoverPlaystation,
@@ -131,14 +131,14 @@ class _DiscoveryStageState extends State<DiscoveryStage> {
             runSpacing: Gt7Spacing.sm,
             children: [
               AppButton(
-                label: 'Exit',
+                label: 'EXIT',
                 onPressed: () => exit(0),
                 backgroundColor: const Color(0xFFCC0000),
                 foregroundColor: Colors.white,
                 borderColor: const Color(0xFFFF4444),
               ),
               AppButton(
-                label: "Let's GO!",
+                  label: "LET'S RACE!",
                 onPressed: widget.connection.isBusy ? null : _applyManualIp,
                 backgroundColor: const Color(0xFF388E3C),
                 foregroundColor: Colors.white,
