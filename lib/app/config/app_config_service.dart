@@ -35,12 +35,10 @@ class AppConfigService extends ChangeNotifier {
 
   Future<void> load() async {
     if (_loaded) {
-      debugPrint('load() skipped — already loaded');
       return;
     }
 
     final storedData = await _store.read();
-    debugPrint('load() storedData: $storedData');
     if (storedData != null) {
       _config = AppConfig.fromJson(storedData);
     }
@@ -49,13 +47,9 @@ class AppConfigService extends ChangeNotifier {
   }
 
   Future<void> save(AppConfig config) async {
-    debugPrint('save() called');
-    debugPrint('equal: ${mapEquals(_config.toJson(), config.toJson())}');
     if (mapEquals(_config.toJson(), config.toJson())) {
-      debugPrint('save() skipped — no changes');
       return;
     }
-    debugPrint('save() writing...');
 
     _config = config.copyWith(
       manualPlaystationIp: config.normalizedManualPlaystationIp,
