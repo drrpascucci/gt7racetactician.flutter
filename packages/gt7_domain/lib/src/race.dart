@@ -70,11 +70,9 @@ class Race {
     final currentLap = laps.last;
     if (currentLap.distanceMeters <= 100) return avgConsumptionPerLap;
 
-    double startFuel = tankCapacity;
-    final prevLap = _lapForNumber(currentLap.lapNumber - 1);
-    if (prevLap != null) {
-      startFuel = prevLap.fuel;
-    }
+    final startFuel = currentLap.fuelAtStart > 0
+        ? currentLap.fuelAtStart
+        : tankCapacity;
 
     final fuelUsed = startFuel - currentLap.fuel;
     if (fuelUsed <= 0) return avgConsumptionPerLap;
@@ -112,15 +110,15 @@ class Race {
       }
     }
 
-    if (remainingLaps < 0 || avgConsumptionPerLap <= 0) {
+    if (remainingLaps < 0 || effectiveConsumptionPerLap <= 0) {
       return stints;
     }
 
-    // Defensive check: ensure avgConsumptionPerLap is positive before division
-    assert(avgConsumptionPerLap > 0, 'avgConsumptionPerLap must be > 0');
+    // Defensive check: ensure effectiveConsumptionPerLap is positive before division
+    assert(effectiveConsumptionPerLap > 0, 'effectiveConsumptionPerLap must be > 0');
     
-    final lapsWithFullTank = (tankCapacity / avgConsumptionPerLap).floor();
-    final lapsWithCurrentFuel = (laps.last.fuel / avgConsumptionPerLap).floor();
+    final lapsWithFullTank = (tankCapacity / effectiveConsumptionPerLap).floor();
+    final lapsWithCurrentFuel = (laps.last.fuel / effectiveConsumptionPerLap).floor();
 
     var stintStart = max(lastRefuelLap, 1);
     var stintEnd = currentLapNumber + lapsWithCurrentFuel;
@@ -140,7 +138,7 @@ class Race {
           endTimeMs: endTimeMs,
           predictedFuelUsed: min(
             tankCapacity,
-            (stintEnd - stintStart + 1 + 0.5) * avgConsumptionPerLap,
+            (stintEnd - stintStart + 1 + 0.5) * effectiveConsumptionPerLap,
           ),
         ),
       );
@@ -178,11 +176,16 @@ class Race {
       return;
     }
 
+    if (lap.fuelAtStart == -1) {
+      lap.fuelAtStart = lap.fuel;
+    }
+
     for (final existingLap in laps) {
       if (existingLap.lapNumber == lap.lapNumber) {
         final oldPosition = existingLap.position;
         existingLap.lapTimeMs = lap.lapTimeMs;
         existingLap.fuel = lap.fuel;
+        existingLap.fuelAtStart = lap.fuelAtStart;
         existingLap.position = lap.position;
         existingLap.distanceMeters = lap.distanceMeters;
 
@@ -212,7 +215,7 @@ class Race {
       if (lapsSinceRefuel > 0) {
         final refuelLap = _lapForNumber(lastRefuelLap);
         if (refuelLap != null) {
-          final fuelUsedFromPitstop = refuelLap.fuel - lap.fuel;
+          final fuelUsedFromPitstop = refuelLap.fuelAtStart - lap.fuel;
           lastLapConsumption = lastFuel - lap.fuel;
           if (fuelUsedFromPitstop > 0) {
             avgConsumptionPerLap = fuelUsedFromPitstop / lapsSinceRefuel;

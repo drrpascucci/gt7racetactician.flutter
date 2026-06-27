@@ -152,6 +152,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
   InternetAddress? _playstationAddress;
   int _packetsReceived = 0;
   int? _currentLapNumber;
+  int? _currentLapStartTimeOfDayMs;
   int? _lastPacketId;
   Gt7Vector3? _lastPosition;
   DateTime? _sessionStartTime;
@@ -241,6 +242,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> resetSession() async {
     _lapHistory.clear();
     _currentLapNumber = null;
+    _currentLapStartTimeOfDayMs = null;
     _totalDistanceMeters = 0;
     _lapDistanceMeters = 0;
     _lastPacketId = null;
@@ -404,6 +406,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       );
       _lapHistory[0] = lap0;
       _race.addOrUpdateLap(lap0);
+      _currentLapStartTimeOfDayMs = packet.timeOfDayMs;
     }
 
     if (_currentLapNumber != null && lapNumber < _currentLapNumber!) {
@@ -420,6 +423,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       );
       _lapHistory[0] = lap0;
       _race.addOrUpdateLap(lap0);
+      _currentLapStartTimeOfDayMs = packet.timeOfDayMs;
     }
 
     if (_currentLapNumber != null && lapNumber > _currentLapNumber!) {
@@ -435,6 +439,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       _lapHistory[completedLapNumber] = completedLap;
       _race.addOrUpdateLap(completedLap);
       _lapDistanceMeters = 0;
+      _currentLapStartTimeOfDayMs = packet.timeOfDayMs;
     }
 
     _currentLapNumber = lapNumber;
@@ -442,9 +447,14 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       lapNumber,
       () => RaceLap(lapNumber: lapNumber),
     );
+
+    final runningTime = _currentLapStartTimeOfDayMs != null
+        ? max(0, packet.timeOfDayMs - _currentLapStartTimeOfDayMs!).toDouble()
+        : 0.0;
+
     currentLap
       ..fuel = packet.fuelLevel
-      ..lapTimeMs = packet.lastLapTimeMs.toDouble()
+      ..lapTimeMs = !currentLap.complete ? runningTime : currentLap.lapTimeMs
       ..position = packet.racePosition
       ..distanceMeters = _lapDistanceMeters
       ..complete = false;

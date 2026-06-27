@@ -2,6 +2,7 @@ class RaceLap implements Comparable<RaceLap> {
   RaceLap({
     required this.lapNumber,
     this.fuel = 0,
+    this.fuelAtStart = -1,
     this.lapTimeMs = 0,
     this.position = 0,
     this.complete = false,
@@ -11,6 +12,7 @@ class RaceLap implements Comparable<RaceLap> {
 
   final int lapNumber;
   double fuel;
+  double fuelAtStart;
   double lapTimeMs;
   double targetTimeMs;
   double distanceMeters;
@@ -26,6 +28,7 @@ class RaceLap implements Comparable<RaceLap> {
 
   void copyValues(RaceLap other) {
     fuel = other.fuel;
+    fuelAtStart = other.fuelAtStart;
     lapTimeMs = other.lapTimeMs;
     targetTimeMs = other.targetTimeMs;
     position = other.position;
