@@ -86,6 +86,7 @@ class TelemetryViewState {
     this.usingManualAddress = false,
     this.minimumTireTemperatures = _emptyWheelValues,
     this.maximumTireTemperatures = _emptyWheelValues,
+    this.totalDistanceMeters = 0,
     this.lastPacketAt,
     this.errorMessage,
   });
@@ -94,6 +95,7 @@ class TelemetryViewState {
     return const TelemetryViewState(
       connectionPhase: RuntimeConnectionPhase.idle,
       packetsReceived: 0,
+      totalDistanceMeters: 0,
     );
   }
 
@@ -102,6 +104,7 @@ class TelemetryViewState {
   final InternetAddress? playstationAddress;
   final bool usingManualAddress;
   final int packetsReceived;
+  final double totalDistanceMeters;
   final Gt7WheelValues minimumTireTemperatures;
   final Gt7WheelValues maximumTireTemperatures;
   final DateTime? lastPacketAt;
@@ -137,6 +140,7 @@ class RaceViewState {
     required this.targetAvgLapTimeMs,
     required this.lastUpdatedAt,
     this.elapsedTime = Duration.zero,
+    this.totalDistanceMeters = 0,
     this.lapDistanceMeters = 0,
     this.trackLength = 0,
     this.currentLap,
@@ -157,6 +161,7 @@ class RaceViewState {
       estimatedTotalTimeMs: 0,
       distanceFromTargetMs: 0,
       targetAvgLapTimeMs: 0,
+      totalDistanceMeters: 0,
       lapDistanceMeters: 0,
       trackLength: 0,
       lastUpdatedAt: DateTime.now(),
@@ -167,6 +172,7 @@ class RaceViewState {
   factory RaceViewState.fromRace({
     required AppConfig config,
     required Race race,
+    double totalDistanceMeters = 0,
     Duration elapsedTime = Duration.zero,
   }) {
     final laps = List<RaceLap>.unmodifiable(
@@ -225,6 +231,7 @@ class RaceViewState {
       estimatedTotalTimeMs: estimatedTotalTimeMs,
       distanceFromTargetMs: distanceFromTargetMs,
       targetAvgLapTimeMs: targetAvgLapTimeMs,
+      totalDistanceMeters: totalDistanceMeters,
       lapDistanceMeters: race.laps.isNotEmpty ? race.laps.last.distanceMeters : 0,
       trackLength: race.trackLength,
       lastUpdatedAt: DateTime.now(),
@@ -247,6 +254,7 @@ class RaceViewState {
   final double estimatedFuelToEnd;
   final double estimatedTotalTimeMs;
   final double distanceFromTargetMs;
+  final double totalDistanceMeters;
   final double lapDistanceMeters;
   final double trackLength;
   final DateTime lastUpdatedAt;

@@ -4,9 +4,10 @@ import 'package:gt7_design_system/gt7_design_system.dart';
 import '../../ui_constants.dart';
 
 class CurrentLapBox extends StatelessWidget {
-  const CurrentLapBox({super.key, required this.currentLap});
+  const CurrentLapBox({super.key, required this.currentLap,required this.odometer});
 
   final int currentLap;
+  final double odometer;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +49,17 @@ class CurrentLapBox extends StatelessWidget {
               ),
             ),
           ),
+          Positioned(
+            bottom: 4,
+            right: 6,
+            child: Text(
+              '${odometer.toStringAsFixed(0)} km',
+              style: TextStyle(
+                color: Gt7Colors.boxLabel,
+                fontSize: 16
+              )
+            )
+          )
         ],
       ),
     );

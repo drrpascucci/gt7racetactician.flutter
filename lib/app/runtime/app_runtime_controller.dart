@@ -1007,6 +1007,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       playstationAddress: _playstationAddress,
       usingManualAddress: _usingManualAddress,
       packetsReceived: _packetsReceived,
+      totalDistanceMeters: _totalDistanceMeters,
       minimumTireTemperatures: _minimumTireTemperatures,
       maximumTireTemperatures: _maximumTireTemperatures,
       lastPacketAt: _latestPacketAt,
@@ -1061,6 +1062,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
     raceState.value = RaceViewState.fromRace(
       config: configService.config,
       race: _buildRaceSnapshot(),
+      totalDistanceMeters: _totalDistanceMeters,
       elapsedTime: elapsed,
     );
   }

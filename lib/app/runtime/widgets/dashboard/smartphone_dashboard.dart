@@ -46,6 +46,7 @@ class SmartphoneDashboard extends StatelessWidget {
               Expanded(
                 child: CurrentLapBox(
                   currentLap: race.currentLapNumber,
+                  odometer: race.totalDistanceMeters,
                 ),
               ),
               const SizedBox(height: 5),

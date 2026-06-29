@@ -195,6 +195,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Expanded(
                                   child: CurrentLapBox(
                                     currentLap: widget.race.currentLapNumber,
+                                    odometer: widget.race.totalDistanceMeters,
                                   ),
                                 ),
                                 const SizedBox(height: 5),
