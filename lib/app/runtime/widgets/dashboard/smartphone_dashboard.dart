@@ -25,11 +25,11 @@ class SmartphoneDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     final temps = telemetry.tireTemperatures;
     final targetLapMs = race.targetAvgLapTimeMs;
-    final lastLapDelta = race.lastCompletedLap?.deltaFromTargetMs ?? 0.0;
+    final lastLapDelta = race.lastCompletedLap?.deltaFromTargetMs ?? -10000.0;
     final hasLastLap = race.lastCompletedLap != null;
     final avgDelta = (race.averageLapTimeMs > 0 && targetLapMs > 0)
         ? race.averageLapTimeMs - targetLapMs
-        : 0.0;
+        : -10000.0;
     final hasAvgData = race.averageLapTimeMs > 0 && targetLapMs > 0;
 
     final predictedStints = race.predictedStints;
@@ -64,7 +64,7 @@ class SmartphoneDashboard extends StatelessWidget {
               const SizedBox(height: 5),
               Expanded(
                 child: DeltaBox(
-                  label: 'LAST LAP',
+                  label: 'LAST LAP DELTA',
                   deltaMs: lastLapDelta,
                   hasData: hasLastLap,
                   targetMs: targetLapMs,
@@ -90,7 +90,7 @@ class SmartphoneDashboard extends StatelessWidget {
               const SizedBox(height: 5),
               Expanded(
                 child: DeltaBox(
-                  label: 'AVERAGE LAP',
+                  label: 'AVERAGE LAP DELTA',
                   deltaMs: avgDelta,
                   hasData: hasAvgData,
                   targetMs: targetLapMs,

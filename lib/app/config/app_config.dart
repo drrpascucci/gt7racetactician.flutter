@@ -28,9 +28,9 @@ class AppConfig {
       shiftPercentage = 85,
       rawLoggingEnabled = false,
       replaySpeedMultiplier = 1.0,
-      tyreColdMax = 70,
-      tyreOptimalMax = 90,
-      tyreHotMax = 110,
+      tyreColdMax = 65,
+      tyreOptimalMax = 80,
+      tyreHotMax = 90,
       viewMode = DashboardViewMode.tablet,
       manualPlaystationIp = null;
 

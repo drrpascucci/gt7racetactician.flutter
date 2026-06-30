@@ -72,10 +72,11 @@ class DeltaBox extends StatelessWidget {
                 Text(
                   hasData
                       ? formatAdaptiveSignedDurationMs(deltaMs, compact: true)
-                      : '0.000',
+                      : 'UPDATING',
                   style: TextStyle(
                     color: qualitativeColor, // Text color matches border
-                    fontSize: UiConstants.compactBigFontSize,
+                    fontSize: hasData ? UiConstants.compactBigFontSize
+                        : UiConstants.smallFontSize,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'JetBrains Mono',
                   ),

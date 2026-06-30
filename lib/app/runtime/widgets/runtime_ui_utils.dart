@@ -130,6 +130,9 @@ String formatAdaptiveSignedDurationMs(
   double milliseconds, {
   required bool compact,
 }) {
+  if (milliseconds <= -10000.0) {
+    return 'ERR';
+  }
   if (!compact || milliseconds.abs() >= 60000) {
     return formatSignedDurationMs(milliseconds);
   }
