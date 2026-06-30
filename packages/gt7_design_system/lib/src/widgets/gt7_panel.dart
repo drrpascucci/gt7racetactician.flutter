@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:gt7_design_system/src/theme/gt7_theme.dart';
 import 'package:gt7_design_system/src/tokens/gt7_spacing.dart';
 import 'package:gt7_design_system/src/tokens/gt7_typography.dart';
 
@@ -24,7 +23,6 @@ class Gt7Panel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gt7 = context.gt7Theme;
     final textTheme = Theme.of(context).textTheme;
 
     return DecoratedBox(

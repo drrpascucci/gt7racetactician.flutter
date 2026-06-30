@@ -175,6 +175,15 @@ class RaceViewState {
     double totalDistanceMeters = 0,
     Duration elapsedTime = Duration.zero,
   }) {
+    final predictedStints = List<RaceStint>.unmodifiable(race.predictedStints);
+    final pitStopAdjustmentMs =
+        race.pitLaneTimeMs * (predictedStints.length - 1).clamp(0, 999);
+
+    final effectiveTargetLaps = race.raceLaps > 0 ? race.raceLaps : config.targetLaps;
+    final targetAvgLapTimeMs = effectiveTargetLaps <= 0
+        ? 0.0
+        : (race.raceTimeMs - pitStopAdjustmentMs) / effectiveTargetLaps;
+
     final laps = List<RaceLap>.unmodifiable(
       race.laps.map(
         (lap) => RaceLap(
@@ -183,7 +192,7 @@ class RaceViewState {
           lapTimeMs: lap.lapTimeMs,
           position: lap.position,
           complete: lap.complete,
-          targetTimeMs: lap.targetTimeMs,
+          targetTimeMs: lap.targetTimeMs > 0 ? lap.targetTimeMs : targetAvgLapTimeMs,
           distanceMeters: lap.distanceMeters,
         ),
       ),
@@ -200,19 +209,13 @@ class RaceViewState {
         ? 0.0
         : completedLaps.fold<double>(0, (total, lap) => total + lap.lapTimeMs) /
               completedLaps.length;
+
     final estimatedTotalTimeMs = averageLapTimeMs <= 0
         ? 0.0
-        : averageLapTimeMs * config.targetLaps;
-    final distanceFromTargetMs = estimatedTotalTimeMs <= 0
+        : averageLapTimeMs * effectiveTargetLaps;
+    final distanceFromTargetMs = estimatedTotalTimeMs <= 0 || config.targetRaceTime.inMilliseconds <= 0
         ? 0.0
         : estimatedTotalTimeMs - config.targetRaceTime.inMilliseconds;
-
-    final predictedStints = List<RaceStint>.unmodifiable(race.predictedStints);
-    final pitStopAdjustmentMs =
-        race.pitLaneTimeMs * (predictedStints.length - 1).clamp(0, 999);
-    final targetAvgLapTimeMs = race.raceLaps <= 0
-        ? 0.0
-        : (race.raceTimeMs - pitStopAdjustmentMs) / race.raceLaps;
 
     return RaceViewState(
       config: config,

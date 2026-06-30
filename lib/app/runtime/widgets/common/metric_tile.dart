@@ -10,7 +10,6 @@ class MetricTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gt7 = context.gt7Theme;
 
     return Container(
       constraints: const BoxConstraints(minWidth: 120),

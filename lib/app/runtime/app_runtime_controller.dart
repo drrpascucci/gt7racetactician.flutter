@@ -374,7 +374,11 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       final dz = packet.position.z - _lastPosition!.z;
       final delta = sqrt(dx * dx + dy * dy + dz * dz);
 
-      if (delta < 500) {
+      final ticks = packet.packetId - _lastPacketId!;
+      // Safeguard against large jumps (e.g. car reset/teleport).
+      // At 400km/h, distance per tick is ~1.85m. 5m/tick allows for up to 1080km/h
+      // and correctly handles distance during packet loss by scaling with [ticks].
+      if (ticks > 0 && delta < ticks * 5.0) {
         _totalDistanceMeters += delta;
         _lapDistanceMeters += delta;
       }

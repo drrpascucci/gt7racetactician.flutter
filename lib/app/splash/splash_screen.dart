@@ -35,11 +35,11 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(120) ,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(100) ,
                   color: Colors.white),
               child: SizedBox(
-                width: 120,
-                height: 120,
+                width: 118,
+                height: 118,
                 child: Image.asset('assets/images/gt7_tactician_icon.png'),
               ),
             ),

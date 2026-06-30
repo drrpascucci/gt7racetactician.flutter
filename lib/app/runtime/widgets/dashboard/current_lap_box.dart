@@ -53,10 +53,12 @@ class CurrentLapBox extends StatelessWidget {
             bottom: 4,
             right: 6,
             child: Text(
-              '${odometer.toStringAsFixed(0)} km',
+              '${UiConstants.formatDouble(odometer?? 12000 / 1000,decimalDigits: 1)} km',
               style: TextStyle(
-                color: Gt7Colors.boxLabel,
-                fontSize: 16
+                color: Colors.white,
+                fontSize: 14.4,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'JetBrains Mono',
               )
             )
           )

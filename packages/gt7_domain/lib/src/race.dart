@@ -188,6 +188,7 @@ class Race {
         existingLap.fuelAtStart = lap.fuelAtStart;
         existingLap.position = lap.position;
         existingLap.distanceMeters = lap.distanceMeters;
+        existingLap.targetTimeMs = avgTargetTimeMs;
 
         if (oldPosition != 0 && oldPosition != lap.position) {
           _eventController.add(PositionChangedEvent(oldPosition, lap.position));
