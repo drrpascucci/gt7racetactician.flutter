@@ -38,6 +38,7 @@ class Gt7DialogFrame extends StatelessWidget {
               if (message != null) ...[
                 Text(
                   message!,
+                  textAlign: TextAlign.center,
                   style: Gt7Typography.textTheme(
                     Theme.of(context).colorScheme,
                   ).bodyLarge?.copyWith(color: gt7.telemetry),

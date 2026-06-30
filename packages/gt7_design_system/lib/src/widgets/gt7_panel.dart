@@ -50,11 +50,12 @@ class Gt7Panel extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             if (title != null)
                               Text(
-                                title!,
+                                title!.toUpperCase(),
+                                textAlign: TextAlign.center,
                                 style: textTheme.titleLarge?.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,

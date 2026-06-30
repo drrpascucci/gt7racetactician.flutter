@@ -195,12 +195,14 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+
   Future<void> initialize() async {
     if (_initialized) {
       return;
     }
 
     _initialized = true;
+
     WidgetsBinding.instance.addObserver(this);
     await _attachTelemetryGateway(_telemetryGateway);
     await configService.load();
@@ -892,9 +894,15 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
       return cachedPath;
     }
 
-    final documentsDirectory = await getApplicationDocumentsDirectory();
+    Directory? directory;
+    if (Platform.isAndroid) {
+      directory = await getDownloadsDirectory();
+      directory ??= await getExternalStorageDirectory();
+    }
+    directory ??= await getApplicationDocumentsDirectory();
+
     final logsDirectory = Directory(
-      '${documentsDirectory.path}${Platform.pathSeparator}telemetry_logs',
+      '${directory.path}${Platform.pathSeparator}telemetry_logs',
     );
     await logsDirectory.create(recursive: true);
     _logsDirectoryPath = logsDirectory.path;

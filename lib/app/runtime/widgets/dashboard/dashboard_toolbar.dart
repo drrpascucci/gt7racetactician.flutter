@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gt7_design_system/gt7_design_system.dart';
 
@@ -19,6 +21,49 @@ Future<void> openSettingsScreen(
   );
 }
 
+Future<void> confirmExit(BuildContext context) async {
+  final shouldExit = await showDialog<bool>(
+    context: context,
+    builder: (context) => Gt7DialogFrame(
+      title: 'Confirm',
+      child: const Text(
+        'Are you sure you want to close GT7 Race Tactictian?',
+        style: TextStyle(color: Colors.white, fontSize: 16),
+      ),
+      actions: [
+        SizedBox(
+          width: double.infinity,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AppButton(
+                label: 'CANCEL',
+                onPressed: () => Navigator.of(context).pop(false),
+                backgroundColor: Gt7Colors.cancel,
+                foregroundColor: Colors.white,
+                compact: true,
+              ),
+              const SizedBox(width: 10),
+              AppButton(
+                label: 'EXIT',
+                onPressed: () => Navigator.of(context).pop(true),
+                backgroundColor: Gt7Colors.negative,
+                foregroundColor: Colors.white,
+                borderColor: Gt7Colors.danger,
+                compact: true,
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+
+  if (shouldExit == true) {
+    exit(0);
+  }
+}
+
 class DashboardToolbar extends StatelessWidget {
   const DashboardToolbar({super.key, required this.controller, required this.connection});
 
@@ -28,37 +73,46 @@ class DashboardToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final phase = connection.phase;
-    final isLive = phase == RuntimeConnectionPhase.live;
     final isBusy = connection.isBusy;
 
-    final simBtnBg = isLive
-        ? const Color(0xFF333333)
-        : phase == RuntimeConnectionPhase.connecting
-        ? const Color(0xFFCC8800)
-        : phase == RuntimeConnectionPhase.error
-        ? const Color(0xFFCC4400)
-        : Gt7Colors.ok;
-    final simBtnLabel = isLive
-        ? 'STOP'
-        : phase == RuntimeConnectionPhase.connecting
-        ? 'CONNECTING'
-        : phase == RuntimeConnectionPhase.error
-        ? 'RETRY'
-        : 'START';
-    final simBtnBorder = isLive
-        ? const Color(0xFFFF4444)
-        : phase == RuntimeConnectionPhase.connecting
-        ? const Color(0xFFFFBB33)
-        : phase == RuntimeConnectionPhase.error
-        ? const Color(0xFFFF4444)
-        : const Color(0xFF555555);
+    final (simBtnBg, simBtnLabel, simBtnBorder) = switch (phase) {
+      RuntimeConnectionPhase.live => (
+          const Color(0xFF333333),
+          'STOP',
+          const Color(0xFFFF4444),
+        ),
+      RuntimeConnectionPhase.connecting => (
+          const Color(0xFFCC8800),
+          'CONNECTING',
+          const Color(0xFFFFBB33),
+        ),
+      RuntimeConnectionPhase.error => (
+          const Color(0xFFCC4400),
+          'RETRY',
+          const Color(0xFFFF4444),
+        ),
+      _ => (
+          Gt7Colors.ok,
+          'START',
+          const Color(0xFF555555),
+        ),
+    };
 
     return Container(
       color: const Color(0xFF1E1E1E),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          // EXIT button aligned to the far left
+          AppButton(
+            label: "EXIT",
+            backgroundColor: const Color(0xFFCC0000),
+            foregroundColor: Colors.white,
+            borderColor: const Color(0xFFFF4444),
+            onPressed: () => confirmExit(context),
+          ),
+          // Fill all space between EXIT and other buttons
+          const Spacer(),
           // SETTINGS
           Tooltip(
             message: 'Open settings',
@@ -69,7 +123,7 @@ class DashboardToolbar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // START - main action button
+          // START/STOP main action button
           Tooltip(
             message: telemetryControlTooltip(phase),
             child: AppButton(
