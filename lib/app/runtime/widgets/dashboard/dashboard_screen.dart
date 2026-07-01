@@ -163,117 +163,145 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final showStatusBar = constraints.maxWidth >= 500;
-        final isSmartphone = widget.config.viewMode == DashboardViewMode.smartphone;
+        final isSmartphone =
+            widget.config.viewMode == DashboardViewMode.smartphone;
         return Container(
           color: Colors.black,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-            // ROW 1 — header: logo + RPM display + LED bar
-            SizedBox(
-              height: 44,
-              child: DashboardTopBar(config: widget.config, telemetry: widget.telemetry),
-            ),
-            // ROW 2 — main content (Expanded) — double-tap toggles view mode
-            Expanded(
-              child: GestureDetector(
-                onDoubleTap: widget.onToggleViewMode,
-                behavior: HitTestBehavior.opaque,
-                child: widget.config.viewMode == DashboardViewMode.smartphone
-                    ? SmartphoneDashboard(
-                        race: widget.race,
-                        telemetry: widget.telemetry,
-                        config: widget.config,
-                      )
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            flex: 20,
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: CurrentLapBox(
-                                    currentLap: widget.race.currentLapNumber,
-                                    odometer: widget.race.totalDistanceMeters,
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                Expanded(
-                                  child: FuelLevelBox(
-                                    fuelLevel: widget.telemetry.fuelLevel,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 5),
-                          Expanded(
-                            flex: 40,
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  flex: 40, // 40% of the vertical space on the left
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      Expanded(
-                                        child: FuelStopBox(
-                                          stopLap: widget.race.predictedStopLap,
-                                          hasData: widget.race.predictedStints.isNotEmpty,
-                                          raceType: widget.config.raceType,
-                                          targetLaps: widget.config.targetLaps,
-                                          predictedStints: widget.race.predictedStints,
-                                          targetRaceTimeMs: widget.config.targetRaceTime.inMilliseconds.toDouble(),
-                                          currentLap: widget.race.currentLapNumber,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 5),
-                                      Expanded(
-                                        child: RemainingStopsBox(
-                                          stops: (widget.race.predictedStints.length - 1).clamp(0, 999),
-                                          hasData: widget.race.predictedStints.isNotEmpty,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                Expanded(
-                                  flex: 60, // 60% of the vertical space on the left
-                                  child: LapSection(
-                                    race: widget.race,
-                                    connection: widget.connection,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 5), // Spacing between left column and tyres
-                          Expanded(
-                            flex: 20,
-                            child: TyreGridTablet(
-                              telemetry: widget.telemetry,
-                              config: widget.config,
-                            ),
-                          ),
-                        ],
-                      ),
+              // ROW 1 — header: logo + RPM display + LED bar
+              SizedBox(
+                height: 44,
+                child: DashboardTopBar(
+                  config: widget.config,
+                  telemetry: widget.telemetry,
+                ),
               ),
-            ),
-            // ROW 3 — button toolbar
-            SizedBox(
-              height: 44,
-              child: DashboardToolbar(
-                controller: widget.controller,
-                connection: widget.connection,
+              // ROW 2 — main content (Expanded) — double-tap toggles view mode
+              Expanded(
+                child: GestureDetector(
+                  onDoubleTap: widget.onToggleViewMode,
+                  behavior: HitTestBehavior.opaque,
+                  child: widget.config.viewMode == DashboardViewMode.smartphone
+                      ? SmartphoneDashboard(
+                          race: widget.race,
+                          telemetry: widget.telemetry,
+                          config: widget.config,
+                        )
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              flex: 40,
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    flex:
+                                        40, // 40% of the vertical space on the left
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        Expanded(
+                                          child: CurrentLapBox(
+                                            currentLap:
+                                                widget.race.currentLapNumber,
+                                            odometer:
+                                                widget.race.totalDistanceMeters,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Expanded(
+                                          child: FuelLevelBox(
+                                            fuelLevel:
+                                                widget.telemetry.fuelLevel,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Expanded(
+                                          child: FuelStopBox(
+                                            stopLap:
+                                                widget.race.predictedStopLap,
+                                            hasData: widget
+                                                .race
+                                                .predictedStints
+                                                .isNotEmpty,
+                                            raceType: widget.config.raceType,
+                                            targetLaps:
+                                                widget.config.targetLaps,
+                                            predictedStints:
+                                                widget.race.predictedStints,
+                                            targetRaceTimeMs: widget
+                                                .config
+                                                .targetRaceTime
+                                                .inMilliseconds
+                                                .toDouble(),
+                                            currentLap:
+                                                widget.race.currentLapNumber,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Expanded(
+                                          child: RemainingStopsBox(
+                                            stops:
+                                                (widget
+                                                            .race
+                                                            .predictedStints
+                                                            .length -
+                                                        1)
+                                                    .clamp(0, 999),
+                                            hasData: widget
+                                                .race
+                                                .predictedStints
+                                                .isNotEmpty,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Expanded(
+                                          child: TyreGridTablet(
+                                            telemetry: widget.telemetry,
+                                            config: widget.config,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Expanded(
+                                    flex:
+                                        60, // 60% of the vertical space on the left
+                                    child: LapSection(
+                                      race: widget.race,
+                                      connection: widget.connection,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ), // Spacing between left column and tyres
+                          ],
+                        ),
+                ),
               ),
-            ),
-            if (showStatusBar)
-              DashboardStatusBar(telemetry: widget.telemetry, connection: widget.connection),
-          ],
-        ),
-      );
+              // ROW 3 — button toolbar
+              SizedBox(
+                height: 44,
+                child: DashboardToolbar(
+                  controller: widget.controller,
+                  connection: widget.connection,
+                ),
+              ),
+              if (showStatusBar)
+                DashboardStatusBar(
+                  telemetry: widget.telemetry,
+                  connection: widget.connection,
+                ),
+            ],
+          ),
+        );
       },
     );
   }

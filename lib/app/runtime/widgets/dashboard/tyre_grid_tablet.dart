@@ -46,9 +46,8 @@ class TyreGridTablet extends StatelessWidget {
               ),
               Expanded(
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-
                     Expanded(
                       child: TyreTile(
                         label: 'FL',

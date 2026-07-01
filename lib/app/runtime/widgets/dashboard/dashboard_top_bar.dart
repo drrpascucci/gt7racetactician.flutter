@@ -64,6 +64,7 @@ class DashboardTopBar extends StatelessWidget {
               limit: rpmLimit,
               blinkAboveRpm: blinkAboveRpm,
               compact: true,
+              totalLeds: config.viewMode == DashboardViewMode.smartphone ? 20 : 30,
             ),
           ),
         ],
