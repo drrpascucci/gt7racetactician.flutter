@@ -13,10 +13,12 @@ class Gt7RpmLedBar extends StatelessWidget {
     this.label,
     this.totalLeds = 20,
     this.compact = false,
+    this.gear = 0
   });
 
   final double rpm;
   final double limit;
+  final int gear;
   /// When set, LEDs blink when [rpm] >= [blinkAboveRpm].
   /// Falls back to 98% of [limit] when null.
   final double? blinkAboveRpm;

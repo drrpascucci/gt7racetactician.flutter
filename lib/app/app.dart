@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:keep_screen_on/keep_screen_on.dart';
 import 'package:gt7_design_system/gt7_design_system.dart';
 
 import 'config/app_config_service.dart';
@@ -44,13 +45,13 @@ class _GT7RaceTacticianState extends State<GT7RaceTactician>
     switch (state) {
       case AppLifecycleState.resumed:
         if (_splashDone) {
-          // unawaited(WakelockPlus.enable());
+          unawaited(KeepScreenOn.turnOn());
         }
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
-        // unawaited(WakelockPlus.disable());
+        unawaited(KeepScreenOn.turnOff());
         break;
       case AppLifecycleState.hidden:
         break;
@@ -62,7 +63,7 @@ class _GT7RaceTacticianState extends State<GT7RaceTactician>
       return;
     }
     setState(() => _splashDone = true);
-    //unawaited(WakelockPlus.enable());
+    unawaited(KeepScreenOn.turnOn());
   }
 
   @override

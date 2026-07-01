@@ -170,6 +170,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
   String? _activeLogFilePath;
   String? _lastReplayLogFilePath;
   String? _logsDirectoryPath;
+  int _currentGear = 1;
 
   bool get hasSelectedPlaystation => _replayMode || _playstationAddress != null;
   bool get isReplayMode => _replayMode;
@@ -1028,6 +1029,7 @@ class AppRuntimeController extends ChangeNotifier with WidgetsBindingObserver {
           (_connectionState.phase == RuntimeConnectionPhase.error
               ? _connectionState.detail
               : null),
+      currentGear: _currentGear,
     );
   }
 

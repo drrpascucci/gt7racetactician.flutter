@@ -20,6 +20,7 @@ dependencies:
   path_provider: ^2.1.4
   shared_preferences: ^2.5.5
   intl: ^0.18.0
+  keep_screen_on: ^6.0.0
 
 dev_dependencies:
   flutter_test:

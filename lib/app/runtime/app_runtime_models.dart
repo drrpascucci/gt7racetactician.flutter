@@ -89,6 +89,7 @@ class TelemetryViewState {
     this.totalDistanceMeters = 0,
     this.lastPacketAt,
     this.errorMessage,
+    this.currentGear = 1,
   });
 
   factory TelemetryViewState.empty() {
@@ -109,6 +110,7 @@ class TelemetryViewState {
   final Gt7WheelValues maximumTireTemperatures;
   final DateTime? lastPacketAt;
   final String? errorMessage;
+  final int currentGear;
 
   bool get hasLivePacket => packet != null;
   double get speedKph => packet?.speedKph ?? 0;

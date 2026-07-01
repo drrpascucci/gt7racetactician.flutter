@@ -470,6 +470,7 @@ Future<void> _seedDashboardState(
       rearLeft: 91,
       rearRight: 92,
     ),
+    currentGear : 1,
   );
 
   await _setLapHistory(

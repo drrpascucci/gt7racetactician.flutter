@@ -13,7 +13,9 @@ class DashboardTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rpm = telemetry.engineRpm;
+    final gear = telemetry.currentGear;
     final packet = telemetry.packet;
+
     // Use maxAlertRpm from live telemetry when available; fall back to 7800
     final maxAlertRpm = (packet != null && packet.maxAlertRpm > 0)
         ? packet.maxAlertRpm.toDouble()
@@ -24,6 +26,7 @@ class DashboardTopBar extends StatelessWidget {
         ? packet.minAlertRpm.toDouble()
         : null;
     final rpmFraction = rpmLimit > 0 ? (rpm / rpmLimit).clamp(0.0, 1.0) : 0.0;
+    final gearLabel = gear == 15 ? 'N' : gear == 0 ? 'R' : gear.toString();
 
     return Container(
       color: const Color(0xFF111111),
@@ -42,17 +45,47 @@ class DashboardTopBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 6),
-          // RPM display: value text + thin progress bar
-          SizedBox(
-            width: 120,
-            child: Text(
-              rpm.toStringAsFixed(0),
-              textAlign: TextAlign.right,
-              style: const TextStyle(
-                color: Color(0xFF00E676),
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+          //Selected Gear
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(color: const Color(0xFF545454), width: 1),
+            ),
+            child: SizedBox(
+              width: 30,
+              child: Text(
+               gearLabel,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF00E676),
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
 
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          // RPM display: value text + thin progress bar
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(color: const Color(0xFF545454), width: 1),
+            ),
+            padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+            child: SizedBox(
+              width: 120,
+              child: Text(
+                "${rpm.toStringAsFixed(0)}",
+                textAlign: TextAlign.right,
+                style: const TextStyle(
+                  color: Color(0xFF00E676),
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+
+                ),
               ),
             ),
           ),
@@ -65,6 +98,7 @@ class DashboardTopBar extends StatelessWidget {
               blinkAboveRpm: blinkAboveRpm,
               compact: true,
               totalLeds: config.viewMode == DashboardViewMode.smartphone ? 20 : 30,
+              gear: gear,
             ),
           ),
         ],
