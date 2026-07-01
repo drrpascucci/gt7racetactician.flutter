@@ -31,7 +31,10 @@ class SmartphoneDashboard extends StatelessWidget {
         ? race.averageLapTimeMs - targetLapMs
         : -10000.0;
     final hasAvgData = race.averageLapTimeMs > 0 && targetLapMs > 0;
-
+    if (hasLastLap)  {
+      debugPrint("raceAvgLapTime : "
+          "${race.averageLapTimeMs} targetTime ${targetLapMs}");
+    }
     final predictedStints = race.predictedStints;
     final stopLap = race.predictedStopLap;
     final remainingStops = (predictedStints.length - 1).clamp(0, 999);

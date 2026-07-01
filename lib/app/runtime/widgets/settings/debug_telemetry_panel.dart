@@ -143,6 +143,9 @@ class DebugTelemetryPanel extends StatelessWidget {
                   await controller.startReplay(
                     speedMultiplier: config.replaySpeedMultiplier,
                   );
+
+
+
                 },
                 label: 'Replay last session',
               ),
