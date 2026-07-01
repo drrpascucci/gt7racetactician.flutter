@@ -53,7 +53,7 @@ class CurrentLapBox extends StatelessWidget {
             bottom: 4,
             right: 6,
             child: Text(
-              '${UiConstants.formatDouble(odometer?? 12000 / 1000,decimalDigits: 1)} km',
+              '${UiConstants.formatDouble(odometer?? 12000 / 1000,decimalDigits: 0)} m',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14.4,
