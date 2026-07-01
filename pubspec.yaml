@@ -18,8 +18,7 @@ dependencies:
   ps_discovery:
     path: packages/ps_discovery
   path_provider: ^2.1.4
-  shared_preferences: ^2.3.3
-  wakelock_plus: ^1.2.4
+  shared_preferences: ^2.5.5
   intl: ^0.18.0
 
 dev_dependencies:

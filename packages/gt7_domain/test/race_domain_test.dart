@@ -157,18 +157,27 @@ void main() {
       }
 
       expect(race.avgLapTimeMs(), closeTo(66666.66666666667, 0.000001));
-      expect(race.averageConsumptionPerLap, 10);
-      expect(race.predictedStop, 3);
-      expect(race.avgTargetTimeMs, 57000);
+      expect(race.averageConsumptionPerLap, 42.5);
+      expect(race.predictedStop, 2);
+      expect(race.avgTargetTimeMs, 45000);
 
       final stints = race.predictedStints;
-      expect(stints, hasLength(2));
+      expect(stints, hasLength(6));
       expect(stints[0].startLap, 1);
-      expect(stints[0].endLap, 3);
-      expect(stints[0].predictedFuelUsed, 35);
-      expect(stints[1].startLap, 4);
-      expect(stints[1].endLap, 9);
-      expect(stints[1].predictedFuelUsed, 65);
+      expect(stints[0].endLap, 2);
+      expect(stints[0].predictedFuelUsed, closeTo(100, 0.001));
+      expect(stints[1].startLap, 3);
+      expect(stints[1].endLap, 4);
+      expect(stints[1].predictedFuelUsed, closeTo(100, 0.001));
+      expect(stints[2].startLap, 5);
+      expect(stints[2].endLap, 6);
+      expect(stints[3].startLap, 7);
+      expect(stints[3].endLap, 8);
+      expect(stints[4].startLap, 9);
+      expect(stints[4].endLap, 9);
+      expect(stints[5].startLap, 10);
+      expect(stints[5].endLap, 10);
+
     });
 
     test('lap delta returns zero until a target is set', () {

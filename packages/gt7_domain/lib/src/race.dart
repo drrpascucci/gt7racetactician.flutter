@@ -22,7 +22,7 @@ class Race {
 
   final List<RaceLap> laps = <RaceLap>[];
 
-  int lastRefuelLap = 1;
+  int lastRefuelLap = 0;
   int _lastEventLap = -1;
   int _lastEventPosition = -1;
   double _lastEventFuel = -1;
@@ -180,22 +180,37 @@ class Race {
       lap.fuelAtStart = lap.fuel;
     }
 
-    for (final existingLap in laps) {
-      if (existingLap.lapNumber == lap.lapNumber) {
-        final oldPosition = existingLap.position;
-        existingLap.lapTimeMs = lap.lapTimeMs;
-        existingLap.fuel = lap.fuel;
-        existingLap.fuelAtStart = lap.fuelAtStart;
-        existingLap.position = lap.position;
-        existingLap.distanceMeters = lap.distanceMeters;
-        existingLap.targetTimeMs = avgTargetTimeMs;
-
-        if (oldPosition != 0 && oldPosition != lap.position) {
-          _eventController.add(PositionChangedEvent(oldPosition, lap.position));
-          _lastEventPosition = lap.position;
-        }
-        return;
+    RaceLap? existingLap;
+    for (final l in laps) {
+      if (l.lapNumber == lap.lapNumber) {
+        existingLap = l;
+        break;
       }
+    }
+
+    final bool isNewLap = existingLap == null;
+    final bool wasComplete = existingLap?.complete ?? false;
+    final lastLap = laps.isNotEmpty ? laps.last : null;
+    final lastFuel = lastLap?.fuel ?? 100;
+
+    if (existingLap != null) {
+      final oldPosition = existingLap.position;
+      existingLap.lapTimeMs = lap.lapTimeMs;
+      existingLap.fuel = lap.fuel;
+      existingLap.fuelAtStart = lap.fuelAtStart;
+      existingLap.position = lap.position;
+      existingLap.distanceMeters = lap.distanceMeters;
+      existingLap.complete = lap.complete;
+      existingLap.targetTimeMs = avgTargetTimeMs;
+
+      if (oldPosition != 0 && oldPosition != lap.position) {
+        _eventController.add(PositionChangedEvent(oldPosition, lap.position));
+        _lastEventPosition = lap.position;
+      }
+    } else {
+      lap.targetTimeMs = avgTargetTimeMs;
+      laps.add(lap);
+      existingLap = lap;
     }
 
     if (!_raceStartedFired && lap.lapNumber == 1) {
@@ -203,33 +218,29 @@ class Race {
       _raceStartedFired = true;
     }
 
-    final lastLap = laps.isNotEmpty ? laps.last : null;
-    final lastFuel = lastLap?.fuel ?? 100;
-
-    lap.targetTimeMs = avgTargetTimeMs;
-
-    final isPitStop = lastLap != null && lap.fuel > lastLap.fuel;
-    if (isPitStop && lap.lapNumber > 1) {
-      lastRefuelLap = lap.lapNumber;
-    } else {
-      final lapsSinceRefuel = lap.lapNumber - lastRefuelLap;
-      if (lapsSinceRefuel > 0) {
-        final refuelLap = _lapForNumber(lastRefuelLap);
-        if (refuelLap != null) {
-          final fuelUsedFromPitstop = refuelLap.fuelAtStart - lap.fuel;
-          lastLapConsumption = lastFuel - lap.fuel;
-          if (fuelUsedFromPitstop > 0) {
-            avgConsumptionPerLap = fuelUsedFromPitstop / lapsSinceRefuel;
+    // Handle lap completion logic
+    if (!wasComplete && lap.complete) {
+      final isPitStop = lastLap != null && lap.fuel > lastLap.fuel;
+      if (isPitStop && lap.lapNumber > 1) {
+        lastRefuelLap = lap.lapNumber;
+      } else {
+        final lapsSinceRefuel = lap.lapNumber - lastRefuelLap;
+        if (lapsSinceRefuel > 0) {
+          final refuelLap = _lapForNumber(lastRefuelLap);
+          if (refuelLap != null) {
+            final fuelUsedFromPitstop = refuelLap.fuelAtStart - lap.fuel;
+            lastLapConsumption = lastFuel - lap.fuel;
+            if (fuelUsedFromPitstop > 0) {
+              avgConsumptionPerLap = fuelUsedFromPitstop / lapsSinceRefuel;
+            }
           }
         }
       }
-    }
 
-    if (lap.complete && lap.lapNumber > 0 && trackLength == 0) {
-      trackLength = lap.distanceMeters;
+      if (lap.lapNumber > 0 && trackLength == 0) {
+        trackLength = lap.distanceMeters;
+      }
     }
-
-    laps.add(lap);
 
     if (lap.lapNumber > _lastEventLap) {
       _eventController.add(NewLapStartedEvent(lap.lapNumber, previousLap: lastLap));
@@ -332,7 +343,7 @@ class Race {
 
   void reset() {
     laps.clear();
-    lastRefuelLap = 1;
+    lastRefuelLap = 0;
     _lastEventLap = -1;
     _lastEventPosition = -1;
     _lastEventFuel = -1;

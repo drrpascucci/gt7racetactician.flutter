@@ -8,7 +8,7 @@ echo ====================================================
 echo.
 
 echo [1/2] Building production APK...
-call flutter build apk --release
+    call flutter build apk --release
 
 if %errorlevel% neq 0 (
     echo.
